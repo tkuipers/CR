@@ -4,10 +4,10 @@ import java.util.List;
 
 public class CRSettings {
 
-  String name;
-  List<String> fileExtensions;
-  List<CRContext> contexts;
-  List<CRStyle> styles;
+  private String name;
+  private List<String> fileExtensions;
+  private List<CRContext> contexts;
+  private List<CRStyle> styles;
 
   public String getName() {
     return name;

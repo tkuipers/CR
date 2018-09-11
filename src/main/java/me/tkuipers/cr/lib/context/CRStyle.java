@@ -1,9 +1,9 @@
 package me.tkuipers.cr.lib.context;
 
 public class CRStyle {
-  String name;
-  String color;
-  String backgrounColor;
+  private String name;
+  private String color;
+  private String backgrounColor;
 
   public CRStyle(){}
 

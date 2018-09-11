@@ -4,8 +4,8 @@
     <bytecodeTargetLevel>
       <module name="CodeReview.CodeReview_main" target="1.8" />
       <module name="CodeReview.CodeReview_test" target="1.8" />
-      <module name="CodeReview_main" target="1.8" />
-      <module name="CodeReview_test" target="1.8" />
+      <module name="CodeReview_main" target="1.10" />
+      <module name="CodeReview_test" target="1.10" />
       <module name="coderview_main" target="1.8" />
       <module name="coderview_test" target="1.8" />
     </bytecodeTargetLevel>

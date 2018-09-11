@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CRContext {
-  CRType type;
-  String regex;
-  List<String> styles;
-  List<String> include;
-  List<CRContext> contexts;
+  private CRType type;
+  private String regex;
+  private List<String> styles;
+  private List<String> include;
+  private List<CRContext> contexts;
 
   public CRContext(){
     styles = Lists.newArrayList();

@@ -13,9 +13,9 @@ import java.util.ArrayList;
 public class CRTokenizer {
 
   public CRTokenizer() throws IOException {
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    var mapper = new ObjectMapper(new YAMLFactory());
 
-    CRContext mainContext = new CRContext();
+    var mainContext = new CRContext();
     mainContext.setRegex("\\{");
     mainContext.setType(CRType.INLINE_PUSH);
     mainContext.setInclude(new ArrayList());
@@ -23,13 +23,13 @@ public class CRTokenizer {
       add("mainStyle");
     }});
 
-    CRStyle mainStyle = new CRStyle();
+    var mainStyle = new CRStyle();
 
     mainStyle.setBackgrounColor("#000000");
     mainStyle.setColor("#000000");
     mainStyle.setName("mainStyle");
 
-    CRSettings settings = new CRSettings();
+    var settings = new CRSettings();
     settings.setName("json");
     settings.setFileExtensions(new ArrayList<String>(){{
       add(".json");
@@ -43,7 +43,7 @@ public class CRTokenizer {
       add(mainContext);
     }});
 
-    String s = mapper.writeValueAsString(settings);
+    var s = mapper.writeValueAsString(settings);
 
     System.out.println("Thing");
     System.out.println(s);

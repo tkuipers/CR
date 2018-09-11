@@ -4,6 +4,4 @@ public enum CRType {
   INLINE_PUSH,
   POP,
   PATTERN
-
-
 }
