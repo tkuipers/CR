@@ -1,0 +1,24 @@
+---
+name: "json"
+fileExtensions:
+- ".json"
+contexts:
+- name: "main"
+  type: "PATTERN"
+  regex: "\\{"
+  styles:
+  - "mainStyle"
+  include: []
+  contexts:
+  - name: "childContext"
+    type: "POP"
+    regex: "\\}"
+    styles:
+    - "mainStyle"
+    include:
+    - "main"
+    contexts: []
+styles:
+- name: "mainStyle"
+  color: "#000000"
+  backgrounColor: "#000000"

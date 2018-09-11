@@ -1,13 +1,14 @@
 package me.tkuipers.cr.lib.data.filebacked;
 
 import com.google.common.collect.Lists;
+import me.tkuipers.cr.lib.data.parsed.Type;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CRContext {
   private String name;
-  private CRType type;
+  private Type type;
   private String regex;
   private List<String> styles;
   private List<String> include;
@@ -30,11 +31,11 @@ public class CRContext {
     this.contexts.addAll(context.contexts.stream().map(m -> m.clone()).collect(Collectors.toList()));
   }
 
-  public CRType getType() {
+  public Type getType() {
     return type;
   }
 
-  public void setType(CRType type) {
+  public void setType(Type type) {
     this.type = type;
   }
 

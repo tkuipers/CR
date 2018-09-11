@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.filebacked.CRContext;
 import me.tkuipers.cr.lib.data.filebacked.CRSettings;
 import me.tkuipers.cr.lib.data.filebacked.CRStyle;
-import me.tkuipers.cr.lib.data.filebacked.CRType;
+import me.tkuipers.cr.lib.data.parsed.Type;
 
 import java.util.ArrayList;
 
@@ -14,9 +14,10 @@ public class TokenizerTestUtils {
 
     var mainContext = new CRContext();
     mainContext.setRegex("\\{");
-    mainContext.setType(CRType.PATTERN);
+    mainContext.setType(Type.PATTERN);
     mainContext.setInclude(new ArrayList());
     mainContext.setStyles(Lists.newArrayList("mainStyle"));
+    mainContext.setName("main");
 
     var mainStyle = new CRStyle();
 

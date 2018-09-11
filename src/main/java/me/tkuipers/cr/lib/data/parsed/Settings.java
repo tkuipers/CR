@@ -8,8 +8,8 @@ import java.util.List;
 public class Settings {
   private String name;
   private List<String> fileExtensions;
-  private List<CRContext> contexts;
-  private List<CRStyle> styles;
+  private List<Context> contexts;
+  private List<Style> styles;
 
   public String getName() {
     return name;
@@ -27,19 +27,19 @@ public class Settings {
     this.fileExtensions = fileExtensions;
   }
 
-  public List<CRContext> getContexts() {
+  public List<Context> getContexts() {
     return contexts;
   }
 
-  public void setContexts(List<CRContext> contexts) {
+  public void setContexts(List<Context> contexts) {
     this.contexts = contexts;
   }
 
-  public List<CRStyle> getStyles() {
+  public List<Style> getStyles() {
     return styles;
   }
 
-  public void setStyles(List<CRStyle> styles) {
+  public void setStyles(List<Style> styles) {
     this.styles = styles;
   }
 }
