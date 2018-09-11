@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ModuleRenamingHistory">
+    <module old-name="CodeReview_main" new-name="CodeReview.CodeReview_main" />
+    <module old-name="CodeReview_test" new-name="CodeReview.CodeReview_test" />
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CodeReview.iml" filepath="$PROJECT_DIR$/.idea/modules/CodeReview.iml" />
