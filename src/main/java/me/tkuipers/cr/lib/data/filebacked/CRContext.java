@@ -1,4 +1,4 @@
-package me.tkuipers.cr.lib.context;
+package me.tkuipers.cr.lib.data.filebacked;
 
 import com.google.common.collect.Lists;
 
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CRContext {
+  private String name;
   private CRType type;
   private String regex;
   private List<String> styles;
@@ -65,5 +66,22 @@ public class CRContext {
 
   public void setContexts(List<CRContext> contexts) { this.contexts = contexts; }
 
+  public String getName() { return name; }
+
+  public void setName(String name) { this.name = name; }
+
   public CRContext clone(){ return new CRContext(this); }
+
+  @Override
+  public String toString() {
+    return "CRContext{" +
+          "name='" + name + '\'' +
+          ", type=" + type +
+          ", regex='" + regex + '\'' +
+          ", styles=" + styles +
+          ", include=" + include +
+          ", contexts=" + contexts +
+          '}';
+  }
+
 }

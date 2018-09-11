@@ -1,9 +1,11 @@
-package me.tkuipers.cr.lib.context;
+package me.tkuipers.cr.lib.data.parsed;
+
+import me.tkuipers.cr.lib.data.filebacked.CRContext;
+import me.tkuipers.cr.lib.data.filebacked.CRStyle;
 
 import java.util.List;
 
-public class CRSettings {
-
+public class Settings {
   private String name;
   private List<String> fileExtensions;
   private List<CRContext> contexts;

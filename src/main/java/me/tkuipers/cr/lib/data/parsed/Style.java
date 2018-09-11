@@ -1,17 +1,10 @@
-package me.tkuipers.cr.lib.context;
+package me.tkuipers.cr.lib.data.parsed;
 
-public class CRStyle {
+public class Style {
   private String name;
   private String color;
   private String backgrounColor;
-
-  public CRStyle(){}
-
-  public CRStyle(CRStyle style){
-    this.name = style.name;
-    this.color = style.color;
-    this.backgrounColor = style.backgrounColor;
-  }
+  private boolean hasSpecialCapability;
 
   public String getName() {
     return name;
@@ -37,5 +30,11 @@ public class CRStyle {
     this.backgrounColor = backgrounColor;
   }
 
-  public CRStyle clone(){ return new CRStyle(this); }
+  public boolean isHasSpecialCapability() {
+    return hasSpecialCapability;
+  }
+
+  public void setHasSpecialCapability(boolean hasSpecialCapability) {
+    this.hasSpecialCapability = hasSpecialCapability;
+  }
 }
