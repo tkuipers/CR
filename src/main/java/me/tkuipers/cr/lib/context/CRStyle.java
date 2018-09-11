@@ -5,6 +5,14 @@ public class CRStyle {
   String color;
   String backgrounColor;
 
+  public CRStyle(){}
+
+  public CRStyle(CRStyle style){
+    this.name = style.name;
+    this.color = style.color;
+    this.backgrounColor = style.backgrounColor;
+  }
+
   public String getName() {
     return name;
   }
@@ -28,4 +36,6 @@ public class CRStyle {
   public void setBackgrounColor(String backgrounColor) {
     this.backgrounColor = backgrounColor;
   }
+
+  public CRStyle clone(){ return new CRStyle(this); }
 }
