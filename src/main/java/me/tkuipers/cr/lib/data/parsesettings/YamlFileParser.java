@@ -1,18 +1,20 @@
-package me.tkuipers.cr.lib;
+package me.tkuipers.cr.lib.data.parsesettings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.filebacked.CRSettings;
-import me.tkuipers.cr.lib.data.filebacked.CRStyle;
-import me.tkuipers.cr.lib.data.parsed.Context;
-import me.tkuipers.cr.lib.data.parsed.Settings;
-import me.tkuipers.cr.lib.data.exceptions.SyntaxParseException;
-import me.tkuipers.cr.lib.data.parsed.Style;
-import me.tkuipers.cr.lib.data.parsed.Type;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRStyle;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Settings;
+import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Style;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -21,7 +23,6 @@ import java.util.stream.Collectors;
 
 public class YamlFileParser {
 
-  private URL syntaxFile;
   private Settings settings;
   private CRSettings crSettings;
   private ObjectMapper mapper;
@@ -30,13 +31,23 @@ public class YamlFileParser {
 
   public YamlFileParser(URL syntaxFile) throws IOException {
     this.mapper = new ObjectMapper(new YAMLFactory());
-    this.syntaxFile = syntaxFile;
     this.crSettings = mapper.readValue(syntaxFile, CRSettings.class);
-    this.settings = parseToSettings();
     this.contextMap = Maps.newHashMap();
   }
 
-  public Settings parseToSettings() {
+  public boolean shouldParse(String filePath){
+    String pathWithDot = "." + FilenameUtils.getExtension(filePath);
+    if(filePath.equals(pathWithDot)){
+      return false;
+    }
+    return crSettings.getFileExtensions().contains(pathWithDot);
+  }
+
+  public Settings getSettings(){
+    return settings;
+  }
+
+  public void build() {
     contextMap = populateContextMap(crSettings.getContexts());
     styleMap = populateStyleMap(crSettings.getStyles());
     var settings = new Settings();
@@ -44,7 +55,7 @@ public class YamlFileParser {
     settings.setFileExtensions(crSettings.getFileExtensions());
     settings.setContexts(buildContexts(crSettings.getContexts()));
     settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
-    return settings;
+    this.settings = settings;
   }
 
   private Map<String, CRStyle> populateStyleMap(List<CRStyle> styles) {

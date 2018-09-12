@@ -1,7 +1,4 @@
-package me.tkuipers.cr.lib.data.parsed;
-
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.filebacked.CRStyle;
+package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package me.tkuipers.cr.lib.data.filebacked;
+package me.tkuipers.cr.lib.data.parsesettings.filebacked;
 
 import com.google.common.collect.Lists;
-import me.tkuipers.cr.lib.data.parsed.Type;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 
 import java.util.List;
 import java.util.stream.Collectors;

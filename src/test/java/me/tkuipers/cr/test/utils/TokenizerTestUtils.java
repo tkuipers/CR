@@ -1,10 +1,10 @@
 package me.tkuipers.cr.test.utils;
 
 import com.google.common.collect.Lists;
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.filebacked.CRSettings;
-import me.tkuipers.cr.lib.data.filebacked.CRStyle;
-import me.tkuipers.cr.lib.data.parsed.Type;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRStyle;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package me.tkuipers.cr.lib.data.parsed;
+package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
 import java.util.List;
 
