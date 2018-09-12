@@ -2,7 +2,7 @@ package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
 import java.util.List;
 
-public class Settings {
+public class Settings implements IContextContainer {
   private String name;
   private List<String> fileExtensions;
   private List<Context> contexts;

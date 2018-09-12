@@ -6,7 +6,9 @@ import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRStyle;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class TokenizerTestUtils {
 
@@ -34,5 +36,13 @@ public class TokenizerTestUtils {
     settings.setContexts(Lists.newArrayList(mainContext));
 
     return settings;
+  }
+
+  public static File buildRandomTempFolder(){
+    var uuid = UUID.randomUUID();
+    var folderPath = "/tmp/" + uuid;
+    var folder = new File(folderPath);
+    folder.mkdirs();
+    return folder;
   }
 }

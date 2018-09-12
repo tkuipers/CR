@@ -35,6 +35,11 @@ public class YamlFileParser {
     this.contextMap = Maps.newHashMap();
   }
 
+  public YamlFileParser(CRSettings settings) throws IOException {
+    this.crSettings = settings;
+    this.contextMap = Maps.newHashMap();
+  }
+
   public boolean shouldParse(String filePath){
     String pathWithDot = "." + FilenameUtils.getExtension(filePath);
     if(filePath.equals(pathWithDot)){
@@ -100,7 +105,6 @@ public class YamlFileParser {
     context.setRegex(con.getRegex());
     context.setType(con.getType());
     context.setContexts(buildContexts(con));
-    //possible inheritance of styles here?
     context.setStyles(buildStyles(con));
     validateContext(context);
     return context;

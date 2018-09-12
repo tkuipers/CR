@@ -2,7 +2,7 @@ package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
 import java.util.List;
 
-public class Context {
+public class Context implements IContextContainer {
 
   private String name;
   private Type type;

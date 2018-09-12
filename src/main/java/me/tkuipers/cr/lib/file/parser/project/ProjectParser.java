@@ -1,19 +1,18 @@
-package me.tkuipers.cr.lib.file.parser;
+package me.tkuipers.cr.lib.file.parser.project;
 
 import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
-import me.tkuipers.cr.lib.data.parsesettings.parsed.Settings;
 import me.tkuipers.cr.lib.file.parser.exceptions.InvalidFolderException;
 
 import java.io.File;
 import java.util.List;
 
-public class FileParser {
+public class ProjectParser {
 
   private List<YamlFileParser> requiredParseSettings;
   private List<YamlFileParser> allParseSettings;
 
-  public FileParser(File syntaxFileLocation, File projectDir){
+  public ProjectParser(File syntaxFileLocation, File projectDir){
     verify(syntaxFileLocation, projectDir);
     requiredParseSettings = Lists.newArrayList();
     allParseSettings = Lists.newArrayList();
