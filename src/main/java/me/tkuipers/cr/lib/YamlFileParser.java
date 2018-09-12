@@ -63,16 +63,20 @@ public class YamlFileParser {
   private Map<String, CRContext> populateContextMap(List<CRContext> conList) {
     Map<String, CRContext> map = Maps.newHashMap();
     for(var context : conList){
-      if(!map.containsKey(context.getName())) {
-        map.put(context.getName(), context);
-        if(context.getContexts().size() != 0){
-          map.putAll(populateContextMap(context.getContexts()));
-        }
-      } else{
-        throw new SyntaxParseException("Could not parse file as there are multiple contexts with the same name: " + context.getName());
-      }
+      addToMap(map, context);
     }
     return map;
+  }
+
+  private void addToMap(Map<String, CRContext> map, CRContext context) {
+    if(!map.containsKey(context.getName())) {
+      map.put(context.getName(), context);
+      if(context.getContexts().size() != 0){
+        map.putAll(populateContextMap(context.getContexts()));
+      }
+    } else{
+      throw new SyntaxParseException("Could not parse file as there are multiple contexts with the same name: " + context.getName());
+    }
   }
 
   private List<Context> buildContexts(List<CRContext> conList) {
