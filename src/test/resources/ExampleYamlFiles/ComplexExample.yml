@@ -11,7 +11,7 @@ contexts:
   include: []
   contexts:
   - name: "childContext"
-    type: "POP"
+    type: "INLINE_PUSH"
     regex: "\\}"
     styles:
     - "style1"
@@ -25,19 +25,19 @@ contexts:
         include: []
         contexts:
         - name: "greatGrandChildContext"
-            type: "POP"
-            regex: "\\}"
-            styles:
-            - "style1"
-            include: []
-            contexts: []
+          type: "POP"
+          regex: "\\}"
+          styles:
+          - "style1"
+          include: []
+          contexts: []
         - name: "greatGrandChildContext1"
-            type: "POP"
-            regex: "\\}"
-            styles:
-            - "style1"
-            include: []
-            contexts: []
+          type: "POP"
+          regex: "\\}"
+          styles:
+          - "style1"
+          include: []
+          contexts: []
 - name: "childContext2"
   type: "PATTERN"
   regex: "\\\\}"
@@ -49,7 +49,7 @@ contexts:
 styles:
 - name: "style1"
   color: "#000000"
-  backgrounColor: "#000000"
+  backgrounColor: "#000001"
 - name: "style2"
   color: "#111111"
   backgrounColor: "#111222"

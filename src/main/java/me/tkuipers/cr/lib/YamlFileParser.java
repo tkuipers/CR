@@ -11,6 +11,7 @@ import me.tkuipers.cr.lib.data.parsed.Context;
 import me.tkuipers.cr.lib.data.parsed.Settings;
 import me.tkuipers.cr.lib.data.exceptions.SyntaxParseException;
 import me.tkuipers.cr.lib.data.parsed.Style;
+import me.tkuipers.cr.lib.data.parsed.Type;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,6 +43,7 @@ public class YamlFileParser {
     settings.setName(crSettings.getName());
     settings.setFileExtensions(crSettings.getFileExtensions());
     settings.setContexts(buildContexts(crSettings.getContexts()));
+    settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
     return settings;
   }
 
@@ -85,7 +87,14 @@ public class YamlFileParser {
     context.setContexts(buildContexts(con));
     //possible inheritance of styles here?
     context.setStyles(buildStyles(con));
+    validateContext(context);
     return context;
+  }
+
+  private void validateContext(Context context) {
+    if(context.getType() == Type.POP && context.getContexts().size() != 0){
+      throw new SyntaxParseException("Cannot have an inner context to a POP context type");
+    }
   }
 
   private List<Style> buildStyles(CRContext con) {

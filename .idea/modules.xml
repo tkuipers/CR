@@ -6,6 +6,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/CR.iml" filepath="$PROJECT_DIR$/CR.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CodeReview.iml" filepath="$PROJECT_DIR$/.idea/modules/CodeReview.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CodeReview_main.iml" filepath="$PROJECT_DIR$/.idea/modules/CodeReview_main.iml" group="CodeReview" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CodeReview_test.iml" filepath="$PROJECT_DIR$/.idea/modules/CodeReview_test.iml" group="CodeReview" />

@@ -13,7 +13,7 @@ contexts:
 styles:
 - name: "mainStyle"
   color: "#000000"
-  backgrounColor: "#000000"
+  backgrounColor: "#000001"
 - name: "childStyle"
   color: "#222222"
   backgrounColor: "#111111"
