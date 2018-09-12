@@ -191,6 +191,8 @@ public class SyntaxFileParserTests {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForUnknownStyle.yml"));
     assertTrue(parser.shouldParse("g.json"));
+    assertTrue(parser.shouldParse("f.g.json"));
+
     assertFalse(parser.shouldParse("g.json1"));
     assertFalse(parser.shouldParse("g.1json"));
     assertFalse(parser.shouldParse("json"));
