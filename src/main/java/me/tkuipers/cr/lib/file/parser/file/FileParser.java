@@ -72,38 +72,6 @@ public class FileParser implements IFileParser {
     throw new RuntimeException("There was a problem");
   }
 
-  public List<StyledString> sdfsdfs(IContextContainer parserContext, String lineToParse){
-    var regexToMatch = parserContext.getContextsCombinedRegex();
-    var fullPattern = Pattern.compile(regexToMatch);
-    var m = fullPattern.matcher(lineToParse);
-    List<StyledString> strings = Lists.newArrayList();
-    var currentContext = parserContext;
-    var prevContext = 0;
-    while(m.find()){
-      if(prevContext != m.start()){
-        var gapString = new StyledString();
-        gapString.setStringValue(lineToParse.substring(prevContext, m.start()));
-        gapString.setStyles(currentContext.getStyles());
-        strings.add(gapString);
-      }
-
-      var s = new StyledString();
-      s.setStringValue(lineToParse.substring(m.start(), m.end()));
-      s.setStyles(currentContext.getStyles());
-      strings.add(s);
-
-      prevContext = m.end();
-    }
-    if(prevContext != lineToParse.length()){
-      var gapString = new StyledString();
-      gapString.setStringValue(lineToParse.substring(prevContext));
-      gapString.setStyles(currentContext.getStyles());
-      strings.add(gapString);
-    }
-
-    return strings;
-  }
-
   @Override
   public List<StyledString> parseFile(IContextContainer parserContext, File fileToParse) {
     return null;
