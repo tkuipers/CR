@@ -13,29 +13,38 @@ import java.util.UUID;
 public class TokenizerTestUtils {
 
   public static CRSettings genSimpleSettings(){
+    var mainContext = genCRContext();
+    var mainStyle = genCRStyle();
 
+
+
+    var settings = new CRSettings();
+    settings.setName("json");
+    settings.setFileExtensions(Lists.newArrayList(".json"));
+    settings.setStyles(Lists.newArrayList(mainStyle));
+    settings.setContexts(Lists.newArrayList(mainContext));
+
+    return settings;
+  }
+
+  public static CRContext genCRContext(){
     var mainContext = new CRContext();
     mainContext.setRegex("\\{");
     mainContext.setType(Type.PATTERN);
     mainContext.setInclude(new ArrayList());
     mainContext.setStyles(Lists.newArrayList("mainStyle"));
     mainContext.setName("main");
+    return mainContext;
+  }
 
+  public static CRStyle genCRStyle(){
     var mainStyle = new CRStyle();
 
     mainStyle.setBackgrounColor("#000000");
     mainStyle.setColor("#000000");
     mainStyle.setName("mainStyle");
 
-    var settings = new CRSettings();
-    settings.setName("json");
-    settings.setFileExtensions(Lists.newArrayList(".json"));
-
-    settings.setStyles(Lists.newArrayList(mainStyle));
-
-    settings.setContexts(Lists.newArrayList(mainContext));
-
-    return settings;
+    return mainStyle;
   }
 
   public static File buildRandomTempFolder(){

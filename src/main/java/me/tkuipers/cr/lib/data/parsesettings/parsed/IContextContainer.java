@@ -4,4 +4,6 @@ import java.util.List;
 
 public interface IContextContainer {
   List<Context> getContexts();
+  String getContextsCombinedRegex();
+  List<Style> getStyles();
 }

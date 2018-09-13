@@ -33,7 +33,7 @@ contexts:
           contexts: []
         - name: "greatGrandChildContext1"
           type: "POP"
-          regex: "\\}"
+          regex: "\\}}"
           styles:
           - "style1"
           include: []

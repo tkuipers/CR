@@ -33,6 +33,7 @@ public class YamlFileParser {
     this.mapper = new ObjectMapper(new YAMLFactory());
     this.crSettings = mapper.readValue(syntaxFile, CRSettings.class);
     this.contextMap = Maps.newHashMap();
+
   }
 
   public YamlFileParser(CRSettings settings) throws IOException {
@@ -60,6 +61,11 @@ public class YamlFileParser {
     settings.setFileExtensions(crSettings.getFileExtensions());
     settings.setContexts(buildContexts(crSettings.getContexts()));
     settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
+
+    var mainContext = contextMap.get("main");
+    settings.setStyles(Lists.newArrayList(buildStyle(styleMap.get(mainContext.getStyles().get(0)))));
+
+    settings.setStyles(Lists.newArrayList(mainContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
     this.settings = settings;
   }
 
@@ -107,7 +113,22 @@ public class YamlFileParser {
     context.setContexts(buildContexts(con));
     context.setStyles(buildStyles(con));
     validateContext(context);
+    addContextDefaults(context);
     return context;
+  }
+
+  private void addContextDefaults(Context context) {
+    if(context.getType() == Type.INLINE_PUSH){
+      context.addContext(getNewlinePop());
+    }
+  }
+
+  private Context getNewlinePop(){
+    var newlinePop = new Context();
+    newlinePop.setName("New line pop");
+    newlinePop.setRegex("(\\r\\n|\\r|\\n)");
+    newlinePop.setType(Type.POP);
+    return newlinePop;
   }
 
   private void validateContext(Context context) {

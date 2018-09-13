@@ -37,4 +37,14 @@ public class Style {
   public void setHasSpecialCapability(boolean hasSpecialCapability) {
     this.hasSpecialCapability = hasSpecialCapability;
   }
+
+  @Override
+  public String toString() {
+    return "Style{" +
+          "name='" + name + '\'' +
+          ", color='" + color + '\'' +
+          ", backgrounColor='" + backgrounColor + '\'' +
+          ", hasSpecialCapability=" + hasSpecialCapability +
+          '}';
+  }
 }

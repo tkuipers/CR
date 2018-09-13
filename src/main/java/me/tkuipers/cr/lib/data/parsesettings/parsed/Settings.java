@@ -1,5 +1,7 @@
 package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
+import me.tkuipers.cr.lib.file.parser.file.regexHandler.RegularExpressionCombiner;
+
 import java.util.List;
 
 public class Settings implements IContextContainer {
@@ -7,6 +9,7 @@ public class Settings implements IContextContainer {
   private List<String> fileExtensions;
   private List<Context> contexts;
   private List<Style> styles;
+  private String combinedRegex;
 
   public String getName() {
     return name;
@@ -28,8 +31,14 @@ public class Settings implements IContextContainer {
     return contexts;
   }
 
+  @Override
+  public String getContextsCombinedRegex() {
+    return combinedRegex;
+  }
+
   public void setContexts(List<Context> contexts) {
     this.contexts = contexts;
+    combinedRegex = RegularExpressionCombiner.combineContexts(contexts);
   }
 
   public List<Style> getStyles() {

@@ -4,17 +4,13 @@ fileExtensions:
 - ".json"
 contexts:
 - name: "main"
-  type: "PATTERN"
+  type: "INLINE_PUSH"
   regex: "\\{"
   styles:
   - "mainStyle"
-  - "childStyle"
   include: []
   contexts: []
 styles:
 - name: "mainStyle"
   color: "#000000"
   backgrounColor: "#000001"
-- name: "childStyle"
-  color: "#222222"
-  backgrounColor: "#111111"
