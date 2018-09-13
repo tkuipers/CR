@@ -36,29 +36,36 @@ public class FileParser implements IFileParser {
     var prevContext = 0;
     while(m.find()){
       if(prevContext != m.start()){
-        var gapString = new StyledString();
-        gapString.setStringValue(lineToParse.substring(prevContext, m.start()));
-        gapString.setStyles(currentContext.getStyles());
+        StyledString gapString = getStyledString(lineToParse, prevContext, m.start(), currentContext);
         strings.add(gapString);
       }
-
-      var s = new StyledString();
       var subString = lineToParse.substring(m.start(), m.end());
-      s.setStringValue(subString);
-      var styles = determineRegexMatch(subString, parserContext).getStyles();
-      s.setStyles(styles);
+      var context = determineRegexMatch(subString, parserContext);
+      var s = getStyledString(lineToParse, m.start(), m.end(), context);
+
       strings.add(s);
 
       prevContext = m.end();
     }
     if(prevContext != lineToParse.length()){
-      var gapString = new StyledString();
-      gapString.setStringValue(lineToParse.substring(prevContext));
-      gapString.setStyles(parserContext.getStyles());
+      var gapString = getStyledString(lineToParse, prevContext, null, parserContext);
       strings.add(gapString);
     }
     return strings;
   }
+
+  private StyledString getStyledString(String lineToParse, Integer start, Integer end, IContextContainer currentContext) {
+    var gapString = new StyledString();
+    if(end != null){
+      gapString.setStringValue(lineToParse.substring(start, end));
+    }
+    else{
+      gapString.setStringValue(lineToParse.substring(start));
+    }
+    gapString.setStyles(currentContext.getStyles());
+    return gapString;
+  }
+
 
   private IContextContainer determineRegexMatch(String subString, IContextContainer parserContext) {
     for(var context : parserContext.getContexts()){

@@ -3,6 +3,7 @@ package me.tkuipers.cr.test.lib.fileparser;
 import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Settings;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 import me.tkuipers.cr.lib.file.parser.file.FileParser;
 import me.tkuipers.cr.lib.file.parser.file.IFileParser;
@@ -132,6 +133,28 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine3.getStyles().size());
     var styleLine3Style = styleLine3.getStyles().get(0);
     assertEquals("mainStyle", styleLine3Style.getName());
+
+  }
+
+  @Test
+  @Ignore
+  public void testParseSimpleInlinePush() throws InterruptedException {
+    parser = new FileParser(settings, file);
+    var contextList = settings.getContexts();
+    var context = contextList.stream().filter(m -> m.getRegex().equals("abc")).findFirst().orElseThrow();
+    context.setType(Type.INLINE_PUSH);
+    context.setRegex("(abc)|(def)");
+    settings.setContexts(contextList);
+
+    var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyzab");
+
+
+    assertEquals(1, styledLines.size());
+    var styleLine1 = styledLines.get(0);
+    assertEquals(1, styleLine1.getStyles().size());
+    var styleLine1Style = styleLine1.getStyles().get(0);
+    assertEquals("otherStyle", styleLine1Style.getName());
+    assertEquals("abcdefghijklmnopqrstuvwxyzab", styleLine1.getStringValue());
 
   }
 
