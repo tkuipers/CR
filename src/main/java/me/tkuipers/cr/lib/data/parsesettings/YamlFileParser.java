@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 public class YamlFileParser {
 
   private Settings settings;
@@ -63,9 +65,9 @@ public class YamlFileParser {
     settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
 
     var mainContext = contextMap.get("main");
-    settings.setStyles(Lists.newArrayList(buildStyle(styleMap.get(mainContext.getStyles().get(0)))));
+    settings.setStyles(newArrayList(buildStyle(styleMap.get(mainContext.getStyles().get(0)))));
 
-    settings.setStyles(Lists.newArrayList(mainContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
+    settings.setStyles(newArrayList(mainContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
     this.settings = settings;
   }
 
@@ -119,16 +121,23 @@ public class YamlFileParser {
 
   private void addContextDefaults(Context context) {
     if(context.getType() == Type.INLINE_PUSH){
-      context.addContext(getNewlinePop(context));
+      context.addContext(getNewlinePop());
+    }
+
+    if(context.getType() == Type.INLINE_PUSH || context.getType() == Type.MULTILINE_PUSH){
+      for(var indContext : context.getContexts()){
+        if(indContext.getType() == Type.POP){
+          indContext.setStyles(context.getStyles());
+        }
+      }
     }
   }
 
-  private Context getNewlinePop(Context context){
+  private Context getNewlinePop(){
     var newlinePop = new Context();
     newlinePop.setName("New line pop");
     newlinePop.setRegex("(\\r\\n|\\r|\\n)");
     newlinePop.setType(Type.POP);
-    newlinePop.setStyles(context.getStyles());
     return newlinePop;
   }
 
@@ -139,7 +148,7 @@ public class YamlFileParser {
   }
 
   private List<Style> buildStyles(CRContext con) {
-    List<Style> list = Lists.newArrayList();
+    List<Style> list = newArrayList();
 
     for(var crStyle : con.getStyles()){
       if(styleMap.containsKey(crStyle)){
@@ -162,7 +171,7 @@ public class YamlFileParser {
   }
 
   private List<Context> buildContexts(CRContext con) {
-    List<Context> list = Lists.newArrayList();
+    List<Context> list = newArrayList();
     for(var crContext : con.getContexts()){
       list.add(buildContext(crContext));
     }
