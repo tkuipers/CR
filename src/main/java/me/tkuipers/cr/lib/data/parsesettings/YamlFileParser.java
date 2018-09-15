@@ -119,15 +119,16 @@ public class YamlFileParser {
 
   private void addContextDefaults(Context context) {
     if(context.getType() == Type.INLINE_PUSH){
-      context.addContext(getNewlinePop());
+      context.addContext(getNewlinePop(context));
     }
   }
 
-  private Context getNewlinePop(){
+  private Context getNewlinePop(Context context){
     var newlinePop = new Context();
     newlinePop.setName("New line pop");
     newlinePop.setRegex("(\\r\\n|\\r|\\n)");
     newlinePop.setType(Type.POP);
+    newlinePop.setStyles(context.getStyles());
     return newlinePop;
   }
 

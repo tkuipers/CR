@@ -1,8 +1,6 @@
 package me.tkuipers.cr.lib.file.parser.file;
 
 import com.google.common.collect.Lists;
-import jdk.jshell.spi.ExecutionControl;
-import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.IContextContainer;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.StyledString;
@@ -10,11 +8,9 @@ import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 
 import java.io.File;
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
 
 public class FileParser implements IFileParser {
 
@@ -34,57 +30,70 @@ public class FileParser implements IFileParser {
     var currentString = lineToParse;
     var stack = new ArrayDeque<IContextContainer>();
     stack.push(parserContext);
-    var regexToMatch = parserContext.getContextsCombinedRegex();
+    var regexToMatch = stack.peek().getContextsCombinedRegex();
     var fullPattern = Pattern.compile(regexToMatch);
     var m = fullPattern.matcher(currentString);
     List<StyledString> strings = Lists.newArrayList();
-    var prevContext = 0;
-    while(m.find()){
-      if(prevContext != m.start()){
-        StyledString gapString = getStyledString(currentString, prevContext, m.start(), stack.peek());
+    var lastMatchEndMarker = 0;
+    while(m.find()) {
+      //build the previous string style first
+      if (lastMatchEndMarker != m.start()) {
+        StyledString gapString = buildStyledString(currentString.substring(lastMatchEndMarker, m.start()), stack.peek());
         strings.add(gapString);
-      }
-      var subString = currentString.substring(m.start(), m.end());
-      var context = determineRegexMatch(subString, stack.peek());
-      if(context != null){
-        stack.push(context);
       }
 
-      StyledString s = null;
-      if(context != null){
-         s = getStyledString(currentString, m.start(), m.end(), context);
-        stack.pop();
-        if(context.getType() == Type.INLINE_PUSH){
-          stack.push(context);
+      //determine the match context
+      var subString = currentString.substring(m.start(), m.end());
+      var context = determineRegexMatch(subString, stack.peek());
+
+      if(context != null) {
+        var stringToApplyTo = currentString.substring(m.start(), m.end());
+        //trim the string to its remaining size
+        currentString = currentString.substring(m.end());
+        //apply style to match
+        strings.add(buildStyledString(stringToApplyTo, context));
+
+        //build the next style string based ont he context
+        switch (context.getType()) {
+          case PATTERN:
+            break;
+          case POP:
+            if (stack.peek().getType() != Type.MAIN) {
+              stack.pop();
+              break;
+            }
+            throw new FileParseException("Cannot POP off of main context");
+          case MULTILINE_PUSH:
+            //should be the same behaviour as INLINE_PUSH
+          case INLINE_PUSH:
+            stack.push(context);
+            break;
+          //push this context on stack and apply it in the future
+          //rebuild matcher
+          default:
+            //throw an exception here, this should never happen
+            throw new FileParseException("An unexpected error occured");
         }
-        if(context.getType() == Type.POP){
-          stack.pop();
-        }
-        prevContext = m.end();
-      }else{
-        var gapString = getStyledString(currentString, prevContext, null, stack.peek());
-        strings.add(gapString);
-        prevContext = currentString.length();
-      }
-      if(s != null){
-        strings.add(s);
+
+        regexToMatch = stack.peek().getContextsCombinedRegex();
+        fullPattern = Pattern.compile(regexToMatch);
+        m = fullPattern.matcher(currentString);
+      } else{
+        break;
       }
     }
-    if(prevContext != currentString.length()){
-      var gapString = getStyledString(currentString, prevContext, null, stack.peek());
-      strings.add(gapString);
+    //add all of the leftover string
+    if(currentString.length() != 0){
+      strings.add(buildStyledString(currentString, stack.peek()));
     }
+
+
     return strings;
   }
 
-  private StyledString getStyledString(String lineToParse, Integer start, Integer end, IContextContainer currentContext) {
+  private StyledString buildStyledString(String s, IContextContainer currentContext) {
     var gapString = new StyledString();
-    if(end != null){
-      gapString.setStringValue(lineToParse.substring(start, end));
-    }
-    else{
-      gapString.setStringValue(lineToParse.substring(start));
-    }
+    gapString.setStringValue(s);
     gapString.setStyles(currentContext.getStyles());
     return gapString;
   }

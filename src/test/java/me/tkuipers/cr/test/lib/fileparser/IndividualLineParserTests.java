@@ -2,6 +2,7 @@ package me.tkuipers.cr.test.lib.fileparser;
 
 import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Settings;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
@@ -25,10 +26,11 @@ public class IndividualLineParserTests {
   private Settings settings;
   private File file;
   private File folder;
+  private CRSettings crSettings;
 
   @Before
   public void setUp() throws IOException {
-    var crSettings = TokenizerTestUtils.genSimpleSettings();
+    crSettings = TokenizerTestUtils.genSimpleSettings();
     var origCRStyle = crSettings.getStyles().get(0);
     var newCRStyle = origCRStyle.clone();
     newCRStyle.setName("otherStyle");
@@ -159,6 +161,46 @@ public class IndividualLineParserTests {
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
     assertEquals("defghijklmnopqrstuvwxyzab", styleLine2.getStringValue());
+
+  }
+
+  @Test
+  public void testParseInlinePushWithNewlineInIt() throws InterruptedException, IOException {
+    var contextList = crSettings.getContexts();
+    var context = contextList.stream().filter(m -> m.getRegex().equals("abc")).findFirst().orElseThrow();
+    context.setType(Type.INLINE_PUSH);
+    context.setRegex("(abc)|(def)");
+    var yamlParser = new YamlFileParser(crSettings);
+    yamlParser.build();
+    settings = yamlParser.getSettings();
+    parser = new FileParser(settings, file);
+
+    var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\nab");
+
+    assertEquals(4, styledLines.size());
+    var styleLine1 = styledLines.get(0);
+    assertEquals(1, styleLine1.getStyles().size());
+    var styleLine1Style = styleLine1.getStyles().get(0);
+    assertEquals("otherStyle", styleLine1Style.getName());
+    assertEquals("abc", styleLine1.getStringValue());
+
+    var styleLine2 = styledLines.get(1);
+    assertEquals(1, styleLine2.getStyles().size());
+    var styleLine2Style = styleLine2.getStyles().get(0);
+    assertEquals("otherStyle", styleLine2Style.getName());
+    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
+
+    var styleLine3 = styledLines.get(2);
+    assertEquals(1, styleLine3.getStyles().size());
+    var styleLine3Style = styleLine3.getStyles().get(0);
+    assertEquals("otherStyle", styleLine3Style.getName());
+    assertEquals("\n", styleLine3.getStringValue());
+
+    var styleLine4 = styledLines.get(3);
+    assertEquals(1, styleLine4.getStyles().size());
+    var styleLine4Style = styleLine4.getStyles().get(0);
+    assertEquals("mainStyle", styleLine4Style.getName());
+    assertEquals("ab", styleLine4.getStringValue());
 
   }
 

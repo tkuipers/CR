@@ -58,8 +58,7 @@ public class Context implements IContextContainer {
   public void addContext(Context c){
     var set = contexts.values().stream().collect(Collectors.toList());
     set.add(c);
-    this.contexts = mapRegexList(set);
-
+    setContexts(set);
   }
 
   private Map<String, Context> mapRegexList(Collection<Context> contexts) {
@@ -77,5 +76,14 @@ public class Context implements IContextContainer {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return "Context{" +
+          "name='" + name + '\'' +
+          ", type=" + type +
+          ", combinedRegex='" + combinedRegex + '\'' +
+          '}';
   }
 }
