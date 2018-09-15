@@ -31,7 +31,7 @@ public class TokenizerTestUtils {
     var mainContext = new CRContext();
     mainContext.setRegex("\\{");
     mainContext.setType(Type.PATTERN);
-    mainContext.setInclude(new ArrayList());
+    mainContext.setInclude(Lists.newArrayList());
     mainContext.setStyles(Lists.newArrayList("mainStyle"));
     mainContext.setName("main");
     return mainContext;

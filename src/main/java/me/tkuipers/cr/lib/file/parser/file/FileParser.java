@@ -8,6 +8,8 @@ import me.tkuipers.cr.lib.file.parser.StyledString;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 
 import java.io.File;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,27 +30,29 @@ public class FileParser implements IFileParser {
 
   @Override
   public List<StyledString> parseLine(IContextContainer parserContext, String lineToParse){
+    var currentString = lineToParse;
+    Deque<IContextContainer> stack = new ArrayDeque<IContextContainer>();
+    stack.push(parserContext);
     var regexToMatch = parserContext.getContextsCombinedRegex();
     var fullPattern = Pattern.compile(regexToMatch);
-    var m = fullPattern.matcher(lineToParse);
+    var m = fullPattern.matcher(currentString);
     List<StyledString> strings = Lists.newArrayList();
-    var currentContext = parserContext;
     var prevContext = 0;
     while(m.find()){
       if(prevContext != m.start()){
-        StyledString gapString = getStyledString(lineToParse, prevContext, m.start(), currentContext);
+        StyledString gapString = getStyledString(currentString, prevContext, m.start(), stack.peek());
         strings.add(gapString);
       }
-      var subString = lineToParse.substring(m.start(), m.end());
-      var context = determineRegexMatch(subString, parserContext);
-      var s = getStyledString(lineToParse, m.start(), m.end(), context);
+      var subString = currentString.substring(m.start(), m.end());
+      var context = determineRegexMatch(subString, stack.peek());
+      var s = getStyledString(currentString, m.start(), m.end(), context);
 
       strings.add(s);
 
       prevContext = m.end();
     }
-    if(prevContext != lineToParse.length()){
-      var gapString = getStyledString(lineToParse, prevContext, null, parserContext);
+    if(prevContext != currentString.length()){
+      var gapString = getStyledString(currentString, prevContext, null, stack.peek());
       strings.add(gapString);
     }
     return strings;
