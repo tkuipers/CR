@@ -1,4 +1,4 @@
-package me.tkuipers.cr.lib.data.filebacked;
+package me.tkuipers.cr.lib.data.parsesettings.filebacked;
 
 public class CRStyle {
   private String name;

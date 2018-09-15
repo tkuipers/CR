@@ -1,27 +1,30 @@
-package me.tkuipers.cr.lib;
+package me.tkuipers.cr.lib.data.parsesettings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.filebacked.CRSettings;
-import me.tkuipers.cr.lib.data.filebacked.CRStyle;
-import me.tkuipers.cr.lib.data.parsed.Context;
-import me.tkuipers.cr.lib.data.parsed.Settings;
-import me.tkuipers.cr.lib.data.exceptions.SyntaxParseException;
-import me.tkuipers.cr.lib.data.parsed.Style;
-import me.tkuipers.cr.lib.data.parsed.Type;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
+import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRStyle;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Settings;
+import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Style;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 public class YamlFileParser {
 
-  private URL syntaxFile;
   private Settings settings;
   private CRSettings crSettings;
   private ObjectMapper mapper;
@@ -30,13 +33,29 @@ public class YamlFileParser {
 
   public YamlFileParser(URL syntaxFile) throws IOException {
     this.mapper = new ObjectMapper(new YAMLFactory());
-    this.syntaxFile = syntaxFile;
     this.crSettings = mapper.readValue(syntaxFile, CRSettings.class);
-    this.settings = parseToSettings();
+    this.contextMap = Maps.newHashMap();
+
+  }
+
+  public YamlFileParser(CRSettings settings) throws IOException {
+    this.crSettings = settings;
     this.contextMap = Maps.newHashMap();
   }
 
-  public Settings parseToSettings() {
+  public boolean shouldParse(String filePath){
+    String pathWithDot = "." + FilenameUtils.getExtension(filePath);
+    if(filePath.equals(pathWithDot)){
+      return false;
+    }
+    return crSettings.getFileExtensions().contains(pathWithDot);
+  }
+
+  public Settings getSettings(){
+    return settings;
+  }
+
+  public void build() {
     contextMap = populateContextMap(crSettings.getContexts());
     styleMap = populateStyleMap(crSettings.getStyles());
     var settings = new Settings();
@@ -44,7 +63,12 @@ public class YamlFileParser {
     settings.setFileExtensions(crSettings.getFileExtensions());
     settings.setContexts(buildContexts(crSettings.getContexts()));
     settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
-    return settings;
+
+    var mainContext = contextMap.get("main");
+    settings.setStyles(newArrayList(buildStyle(styleMap.get(mainContext.getStyles().get(0)))));
+
+    settings.setStyles(newArrayList(mainContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
+    this.settings = settings;
   }
 
   private Map<String, CRStyle> populateStyleMap(List<CRStyle> styles) {
@@ -89,10 +113,32 @@ public class YamlFileParser {
     context.setRegex(con.getRegex());
     context.setType(con.getType());
     context.setContexts(buildContexts(con));
-    //possible inheritance of styles here?
     context.setStyles(buildStyles(con));
     validateContext(context);
+    addContextDefaults(context);
     return context;
+  }
+
+  private void addContextDefaults(Context context) {
+    if(context.getType() == Type.INLINE_PUSH){
+      context.addContext(getNewlinePop());
+    }
+
+    if(context.getType() == Type.INLINE_PUSH || context.getType() == Type.MULTILINE_PUSH){
+      for(var indContext : context.getContexts()){
+        if(indContext.getType() == Type.POP){
+          indContext.setStyles(context.getStyles());
+        }
+      }
+    }
+  }
+
+  private Context getNewlinePop(){
+    var newlinePop = new Context();
+    newlinePop.setName("New line pop");
+    newlinePop.setRegex("(\\r\\n|\\r|\\n)");
+    newlinePop.setType(Type.POP);
+    return newlinePop;
   }
 
   private void validateContext(Context context) {
@@ -102,7 +148,7 @@ public class YamlFileParser {
   }
 
   private List<Style> buildStyles(CRContext con) {
-    List<Style> list = Lists.newArrayList();
+    List<Style> list = newArrayList();
 
     for(var crStyle : con.getStyles()){
       if(styleMap.containsKey(crStyle)){
@@ -125,7 +171,7 @@ public class YamlFileParser {
   }
 
   private List<Context> buildContexts(CRContext con) {
-    List<Context> list = Lists.newArrayList();
+    List<Context> list = newArrayList();
     for(var crContext : con.getContexts()){
       list.add(buildContext(crContext));
     }

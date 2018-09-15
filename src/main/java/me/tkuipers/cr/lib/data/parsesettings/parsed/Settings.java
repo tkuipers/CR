@@ -1,15 +1,15 @@
-package me.tkuipers.cr.lib.data.parsed;
+package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.filebacked.CRStyle;
+import me.tkuipers.cr.lib.file.parser.file.regexHandler.RegularExpressionCombiner;
 
 import java.util.List;
 
-public class Settings {
+public class Settings implements IContextContainer {
   private String name;
   private List<String> fileExtensions;
   private List<Context> contexts;
   private List<Style> styles;
+  private String combinedRegex;
 
   public String getName() {
     return name;
@@ -31,12 +31,23 @@ public class Settings {
     return contexts;
   }
 
+  @Override
+  public String getContextsCombinedRegex() {
+    return combinedRegex;
+  }
+
   public void setContexts(List<Context> contexts) {
     this.contexts = contexts;
+    combinedRegex = RegularExpressionCombiner.combineContexts(contexts);
   }
 
   public List<Style> getStyles() {
     return styles;
+  }
+
+  @Override
+  public Type getType() {
+    return Type.MAIN;
   }
 
   public void setStyles(List<Style> styles) {

@@ -18,6 +18,8 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.6'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 

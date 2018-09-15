@@ -1,26 +1,24 @@
 package me.tkuipers.cr.test.lib;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import me.tkuipers.cr.lib.YamlFileParser;
-import me.tkuipers.cr.lib.data.exceptions.SyntaxParseException;
-import me.tkuipers.cr.lib.data.filebacked.CRContext;
-import me.tkuipers.cr.lib.data.parsed.Type;
-import me.tkuipers.cr.test.utils.TokenizerTestUtils;
+import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
+import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class YamlFileParserTests {
+public class SyntaxFileParserTests {
 
   @Test
   public void testSimpleSituation() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/SimpleSyntaxFile.yml"));
-
-    var settings = parser.parseToSettings();
+    parser.build();
+    var settings = parser.getSettings();
 
     assertEquals("json", settings.getName());
     assertEquals(1, settings.getFileExtensions().size());
@@ -42,8 +40,8 @@ public class YamlFileParserTests {
   public void testParseFileWithMultipleContexts() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/MultipleContextExample.yml"));
-
-    var settings = parser.parseToSettings();
+    parser.build();
+    var settings = parser.getSettings();
 
     var context = settings.getContexts().get(0);
     var innerContext = context.getContexts().get(0);
@@ -59,7 +57,8 @@ public class YamlFileParserTests {
   public void testInclude() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/IncludeExample.yml"));
-    var settings = parser.parseToSettings();
+    parser.build();
+    var settings = parser.getSettings();
 
     var context = settings.getContexts().stream().filter(m -> m.getName().equals("childContext2")).findFirst().orElseThrow();
     assertEquals("childContext2", context.getName());
@@ -84,7 +83,8 @@ public class YamlFileParserTests {
   public void testMultipleStyle() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/MultipleStyleExample.yml"));
-    var settings = parser.parseToSettings();
+    parser.build();
+    var settings = parser.getSettings();
 
     assertEquals(2, settings.getStyles().size());
     var style = settings.getStyles().get(0);
@@ -99,11 +99,32 @@ public class YamlFileParserTests {
   }
 
   @Test
+  public void testInlinePushHasNewlinePop() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/InlinePushExample.yml"));
+    parser.build();
+    var settings = parser.getSettings();
+
+    assertEquals(1, settings.getStyles().size());
+    var style = settings.getStyles().get(0);
+    assertEquals("mainStyle", style.getName());
+    assertEquals("#000000", style.getColor());
+    assertEquals("#000001", style.getBackgrounColor());
+    var context = settings.getContexts().stream().filter(m -> m.getName().equals("main")).findFirst().orElseThrow();
+    assertEquals(1, context.getContexts().size());
+    var innerContext = context.getContexts().get(0);
+    assertEquals("New line pop", innerContext.getName());
+    assertEquals(Type.POP, innerContext.getType());
+    assertEquals("(\\r\\n|\\r|\\n)", innerContext.getRegex());
+
+  }
+
+  @Test
   public void testComplexExample() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/ComplexExample.yml"));
-
-    var settings = parser.parseToSettings();
+    parser.build();
+    var settings = parser.getSettings();
 
     assertEquals("json", settings.getName());
     assertEquals(1, settings.getFileExtensions().size());
@@ -123,7 +144,7 @@ public class YamlFileParserTests {
     assertEquals("\\}", childContext.getRegex());
     assertEquals(1, childContext.getStyles().size());
 
-    assertEquals(1, childContext.getContexts().size());
+    assertEquals(2, childContext.getContexts().size());
     var grandChildContext = childContext.getContexts().get(0);
     assertEquals("grandChildContext", grandChildContext.getName());
     assertEquals(Type.PATTERN, grandChildContext.getType());
@@ -154,32 +175,50 @@ public class YamlFileParserTests {
   public void testPopHasInnerContextFail() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForPopHavingInnerContext.yml"));
+    parser.build();
 
-    var settings = parser.parseToSettings();
+    var settings =parser.getSettings();
   }
 
   @Test(expected = StackOverflowError.class)
   public void testInifiniteRecursionFail() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForInfiniteRecursion.yml"));
+    parser.build();
 
-    var settings = parser.parseToSettings();
+    var settings = parser.getSettings();
   }
 
   @Test(expected = SyntaxParseException.class)
   public void testUnknownIncludeFail() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForUnknownInclude.yml"));
+    parser.build();
 
-    var settings = parser.parseToSettings();
+    var settings = parser.getSettings();
   }
 
   @Test(expected = SyntaxParseException.class)
   public void testUnknownStyleFail() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForUnknownStyle.yml"));
+    parser.build();
 
-    var settings = parser.parseToSettings();
+    var settings = parser.getSettings();
+  }
+
+  @Test
+  public void testShouldParse() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForUnknownStyle.yml"));
+    assertTrue(parser.shouldParse("g.json"));
+    assertTrue(parser.shouldParse("f.g.json"));
+
+    assertFalse(parser.shouldParse("g.json1"));
+    assertFalse(parser.shouldParse("g.1json"));
+    assertFalse(parser.shouldParse("json"));
+    assertFalse(parser.shouldParse(".json"));
+    assertFalse(parser.shouldParse("g.xml"));
   }
 
 

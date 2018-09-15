@@ -1,4 +1,4 @@
-package me.tkuipers.cr.lib.data.parsed;
+package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
 public class Style {
   private String name;
@@ -36,5 +36,15 @@ public class Style {
 
   public void setHasSpecialCapability(boolean hasSpecialCapability) {
     this.hasSpecialCapability = hasSpecialCapability;
+  }
+
+  @Override
+  public String toString() {
+    return "Style{" +
+          "name='" + name + '\'' +
+          ", color='" + color + '\'' +
+          ", backgrounColor='" + backgrounColor + '\'' +
+          ", hasSpecialCapability=" + hasSpecialCapability +
+          '}';
   }
 }
