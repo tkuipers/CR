@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import jdk.jshell.spi.ExecutionControl;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.IContextContainer;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.StyledString;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 
@@ -31,7 +32,7 @@ public class FileParser implements IFileParser {
   @Override
   public List<StyledString> parseLine(IContextContainer parserContext, String lineToParse){
     var currentString = lineToParse;
-    Deque<IContextContainer> stack = new ArrayDeque<IContextContainer>();
+    var stack = new ArrayDeque<IContextContainer>();
     stack.push(parserContext);
     var regexToMatch = parserContext.getContextsCombinedRegex();
     var fullPattern = Pattern.compile(regexToMatch);
@@ -45,11 +46,29 @@ public class FileParser implements IFileParser {
       }
       var subString = currentString.substring(m.start(), m.end());
       var context = determineRegexMatch(subString, stack.peek());
-      var s = getStyledString(currentString, m.start(), m.end(), context);
+      if(context != null){
+        stack.push(context);
+      }
 
-      strings.add(s);
-
-      prevContext = m.end();
+      StyledString s = null;
+      if(context != null){
+         s = getStyledString(currentString, m.start(), m.end(), context);
+        stack.pop();
+        if(context.getType() == Type.INLINE_PUSH){
+          stack.push(context);
+        }
+        if(context.getType() == Type.POP){
+          stack.pop();
+        }
+        prevContext = m.end();
+      }else{
+        var gapString = getStyledString(currentString, prevContext, null, stack.peek());
+        strings.add(gapString);
+        prevContext = currentString.length();
+      }
+      if(s != null){
+        strings.add(s);
+      }
     }
     if(prevContext != currentString.length()){
       var gapString = getStyledString(currentString, prevContext, null, stack.peek());
@@ -80,7 +99,7 @@ public class FileParser implements IFileParser {
         return context;
       }
     }
-    throw new RuntimeException("There was a problem");
+    return null;
   }
 
   @Override

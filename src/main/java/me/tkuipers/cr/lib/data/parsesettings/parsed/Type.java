@@ -4,5 +4,6 @@ public enum Type {
   INLINE_PUSH,
   POP,
   PATTERN,
-  MULTILINE_PUSH
+  MULTILINE_PUSH,
+  MAIN
 }

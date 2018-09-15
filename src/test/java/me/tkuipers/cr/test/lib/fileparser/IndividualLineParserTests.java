@@ -137,7 +137,6 @@ public class IndividualLineParserTests {
   }
 
   @Test
-  @Ignore
   public void testParseSimpleInlinePush() throws InterruptedException {
     parser = new FileParser(settings, file);
     var contextList = settings.getContexts();
@@ -148,13 +147,18 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyzab");
 
-
-    assertEquals(1, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
     assertEquals("otherStyle", styleLine1Style.getName());
-    assertEquals("abcdefghijklmnopqrstuvwxyzab", styleLine1.getStringValue());
+    assertEquals("abc", styleLine1.getStringValue());
+
+    var styleLine2 = styledLines.get(1);
+    assertEquals(1, styleLine2.getStyles().size());
+    var styleLine2Style = styleLine2.getStyles().get(0);
+    assertEquals("otherStyle", styleLine2Style.getName());
+    assertEquals("defghijklmnopqrstuvwxyzab", styleLine2.getStringValue());
 
   }
 
