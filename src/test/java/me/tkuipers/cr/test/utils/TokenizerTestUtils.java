@@ -16,8 +16,6 @@ public class TokenizerTestUtils {
     var mainContext = genCRContext();
     var mainStyle = genCRStyle();
 
-
-
     var settings = new CRSettings();
     settings.setName("json");
     settings.setFileExtensions(Lists.newArrayList(".json"));
