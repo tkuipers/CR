@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import javafx.util.Pair;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRSettings;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRStyle;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -30,17 +32,19 @@ public class YamlFileParser {
   private ObjectMapper mapper;
   private Map<String, CRContext> contextMap;
   private Map<String, CRStyle> styleMap;
+  private List<Pair<String, String>> recursionList;
 
   public YamlFileParser(URL syntaxFile) throws IOException {
     this.mapper = new ObjectMapper(new YAMLFactory());
     this.crSettings = mapper.readValue(syntaxFile, CRSettings.class);
     this.contextMap = Maps.newHashMap();
-
+    this.recursionList = Lists.newArrayList();
   }
 
   public YamlFileParser(CRSettings settings) throws IOException {
     this.crSettings = settings;
     this.contextMap = Maps.newHashMap();
+    this.recursionList = Lists.newArrayList();
   }
 
   public boolean shouldParse(String filePath){
@@ -61,15 +65,34 @@ public class YamlFileParser {
     var settings = new Settings();
     settings.setName(crSettings.getName());
     settings.setFileExtensions(crSettings.getFileExtensions());
-    settings.setContexts(buildContexts(crSettings.getContexts()));
+    settings.setContexts(buildContexts(crSettings.getContexts(), null));
     settings.setStyles(styleMap.values().stream().map(m -> buildStyle(m)).collect(Collectors.toList()));
 
-    var mainContext = contextMap.get("main");
-    settings.setStyles(newArrayList(buildStyle(styleMap.get(mainContext.getStyles().get(0)))));
+    var mainCRContext = contextMap.get("main");
+    settings.setStyles(newArrayList(buildStyle(styleMap.get(mainCRContext.getStyles().get(0)))));
 
-    settings.setStyles(newArrayList(mainContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
+    settings.setStyles(newArrayList(mainCRContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
+    //var mainContext = settings.getContexts().stream().filter(m -> m.getType() == Type.MAIN).findFirst();
     this.settings = settings;
+
+    //detect the loop
+    //add it to post procesing using impl and ID
+    handleRecursions();
   }
+
+  private void handleRecursions() {
+    for(var pair : recursionList){
+      var parent = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getKey())).findFirst();
+      var child = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getValue())).findFirst();
+      if(parent.isPresent()){
+        if(child.isPresent()){
+          parent.get().addContext(child.get());
+        }
+      }
+    }
+
+  }
+
 
   private Map<String, CRStyle> populateStyleMap(List<CRStyle> styles) {
     Map<String, CRStyle> map = Maps.newHashMap();
@@ -103,17 +126,19 @@ public class YamlFileParser {
     }
   }
 
-  private List<Context> buildContexts(List<CRContext> conList) {
-    return conList.stream().map(con -> buildContext(con)).collect(Collectors.toList());
+  private List<Context> buildContexts(List<CRContext> conList, Context parentContext) {
+    return conList.stream().map(con -> buildContext(con, parentContext)).collect(Collectors.toList());
   }
 
-  private Context buildContext(CRContext con) {
+  private Context buildContext(CRContext con, Context parentContext) {
     var context = new Context();
     context.setName(con.getName());
     context.setRegex(con.getRegex());
     context.setType(con.getType());
-    context.setContexts(buildContexts(con));
+    context.setParent(parentContext);
+    context.setContexts(buildContexts(con, context));
     context.setStyles(buildStyles(con));
+
     validateContext(context);
     addContextDefaults(context);
     return context;
@@ -170,19 +195,36 @@ public class YamlFileParser {
     return style;
   }
 
-  private List<Context> buildContexts(CRContext con) {
+  private List<Context> buildContexts(CRContext con, Context parentContext) {
     List<Context> list = newArrayList();
     for(var crContext : con.getContexts()){
-      list.add(buildContext(crContext));
+      list.add(buildContext(crContext, parentContext));
     }
     for(var include : con.getInclude()){
       if(contextMap.containsKey(include)){
-        list.add(buildContext(contextMap.get(include)));
+        CRContext context = contextMap.get(include);
+        if(!recursionInContext(context, parentContext)) {
+          list.add(buildContext(context, parentContext));
+        }
+        else{
+          recursionList.add(new Pair<>(context.getName(), include));
+        }
       }
       else{
         throw new SyntaxParseException("Found unexpected context type to include: " + include);
       }
     }
     return list;
+  }
+
+  private boolean recursionInContext(CRContext context, Context parentContext) {
+    Context curContext = parentContext;
+    while(curContext != null){
+      if(curContext.getName().equals(context.getName())){
+        return true;
+      }
+      curContext = curContext.getParent();
+    }
+    return false;
   }
 }

@@ -34,6 +34,7 @@ public class FileParser implements IFileParser {
     List<StyledString> strings = Lists.newArrayList();
     var lastMatchEndMarker = 0;
     while(m.find()) {
+      System.out.println("Stack at: " + currentString + ": " + stack);
       addGapStringToList(currentString, stack, m, strings, lastMatchEndMarker);
       var stringToApplyTo = currentString.substring(m.start(), m.end());
       IContextContainer context = getContextForSubString(stringToApplyTo, stack);
@@ -95,8 +96,10 @@ public class FileParser implements IFileParser {
         throw new FileParseException("Cannot POP off of main context");
       case MULTILINE_PUSH:
       case INLINE_PUSH:
+      case MAIN:
         stack.push(context);
         break;
+
       default:
         throw new FileParseException("An unexpected error occured");
     }

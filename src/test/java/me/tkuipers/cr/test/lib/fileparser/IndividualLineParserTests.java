@@ -9,6 +9,7 @@ import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 import me.tkuipers.cr.lib.file.parser.file.FileParser;
 import me.tkuipers.cr.lib.file.parser.file.IFileParser;
+import me.tkuipers.cr.lib.file.parser.tokentranslator.HTMLTokenTranslator;
 import me.tkuipers.cr.test.utils.TokenizerTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -449,6 +450,54 @@ public class IndividualLineParserTests {
     var styleLine4Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine4Style.getName());
     assertEquals("\nab", styleLine4.getStringValue());
+  }
+
+  @Test
+  @Ignore
+  public void testExampleJSONFile() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
+    parser.build();
+    var json = "execute \"song\";\n" +
+          "\n" +
+          "group {\n" +
+          "   execute 1;\n" +
+          "   execute 2;\n" +
+          "   // This is a comment\n" +
+          "   print \"hello\";\n" +
+          "   \n" +
+          "   /* This \n" +
+          "   is \n" +
+          "   a \n" +
+          "   multiline\n" +
+          "   comment */\n" +
+          "   a (1,2,3);\n" +
+          "   a;\n" +
+          "   group {\n" +
+          "   \n" +
+          "   }\n" +
+          "}";
+    var fParser = new FileParser(parser.getSettings(), file);
+    var styledLines = fParser.parseLine(parser.getSettings(), json);
+    System.out.println(styledLines);
+
+    System.out.println(new HTMLTokenTranslator().getStringFromToken(styledLines));
+  }
+
+  @Test
+  public void testExampleSmallCase() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
+    parser.build();
+    var json =
+          "group {\n" +
+          "  \n" +
+          "}\n";
+    var fParser = new FileParser(parser.getSettings(), file);
+    var styledLines = fParser.parseLine(parser.getSettings(), json);
+    System.out.println(styledLines);
+
+    System.out.println(new HTMLTokenTranslator().getStringFromToken(styledLines));
   }
 
 }

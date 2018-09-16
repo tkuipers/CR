@@ -3,6 +3,7 @@ package me.tkuipers.cr.test.lib;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
 import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
+import me.tkuipers.cr.lib.file.parser.file.FileParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -180,8 +181,8 @@ public class SyntaxFileParserTests {
     var settings =parser.getSettings();
   }
 
-  @Test(expected = StackOverflowError.class)
-  public void testInifiniteRecursionFail() throws IOException {
+  @Test
+  public void testInifiniteRecursionWorks() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/FailForInfiniteRecursion.yml"));
     parser.build();
@@ -219,6 +220,11 @@ public class SyntaxFileParserTests {
     assertFalse(parser.shouldParse("json"));
     assertFalse(parser.shouldParse(".json"));
     assertFalse(parser.shouldParse("g.xml"));
+  }
+
+  @Test
+  public void testJsonSyntaxParses() throws IOException {
+
   }
 
 

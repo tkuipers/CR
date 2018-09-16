@@ -16,6 +16,7 @@ public class Context implements IContextContainer {
   private List<Style> styles;
   private Map<String, Context> contexts;
   private String combinedRegex;
+  private Context parent;
 
   public Type getType() {
     return type;
@@ -52,6 +53,9 @@ public class Context implements IContextContainer {
 
   public void setContexts(List<Context> contexts) {
     this.contexts = mapRegexList(contexts);
+    System.out.println("\tRenewing regex");
+    System.out.println("\tOld regex: " + combinedRegex);
+    System.out.println("\tNew regex: " + RegularExpressionCombiner.combineContexts(contexts));
     combinedRegex = RegularExpressionCombiner.combineContexts(contexts);
   }
 
@@ -62,10 +66,10 @@ public class Context implements IContextContainer {
   }
 
   private Map<String, Context> mapRegexList(Collection<Context> contexts) {
+    System.out.println("IN THIS METHOD");
     Map<String, Context> map = Maps.newHashMap();
     for (var context:contexts) {
       map.put(context.getRegex(), context);
-
     }
     return map;
   }
@@ -76,6 +80,14 @@ public class Context implements IContextContainer {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Context getParent() {
+    return parent;
+  }
+
+  public void setParent(Context parent) {
+    this.parent = parent;
   }
 
   @Override
