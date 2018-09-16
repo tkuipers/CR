@@ -46,6 +46,11 @@ public class Settings implements IContextContainer {
   }
 
   @Override
+  public List<Style> getInheritedStyles() {
+    return null;
+  }
+
+  @Override
   public Type getType() {
     return Type.MAIN;
   }

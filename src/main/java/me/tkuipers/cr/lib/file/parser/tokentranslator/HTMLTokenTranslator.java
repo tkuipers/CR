@@ -60,7 +60,6 @@ public class HTMLTokenTranslator implements TokenTranslator {
 
   private String buildIndividualStyle(Style style){
     var builder = new StringBuilder();
-    //System.out.println("Style: " + style.getName());
 
     var sanitized = style.getName().replace("/[!\\\"#$%&'\\(\\)\\*\\+,\\.\\/:;<=>\\?\\@\\[\\\\\\]\\^`\\{\\|\\}~]/g", "");
     style.setName(sanitized);

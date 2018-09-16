@@ -81,13 +81,9 @@ public class YamlFileParser {
   }
 
   private void handleRecursions() {
-    System.out.println("RecursionList: " + recursionList);
     for(var pair : recursionList){
       var parent = findContext(pair.getKey(), settings.getContexts());
       var child = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getValue())).findFirst();
-      System.out.println("checking the thing");
-      System.out.println("parent is present: " + (parent != null));
-      System.out.println("child is present: " + child.isPresent());
       if(parent != null){
         if(child.isPresent()){
           for(var grandChildContext : child.get().getContexts()){
@@ -103,7 +99,6 @@ public class YamlFileParser {
   private Context findContext(String contextName, List<Context> contexts){
     Context out = null;
     for(var context :contexts){
-      System.out.println("Comparing: " + contextName + " to " + context.getName());
       if(context.getName().equals(contextName)){
         out =  context;
         break;
@@ -165,8 +160,9 @@ public class YamlFileParser {
     context.setRegex(con.getRegex());
     context.setType(con.getType());
     context.setParent(parentContext);
-    context.setContexts(buildContexts(con, context));
     context.setStyles(buildStyles(con));
+    context.setContexts(buildContexts(con, context));
+
 
     validateContext(context);
     addContextDefaults(context);
@@ -175,7 +171,24 @@ public class YamlFileParser {
 
   private void addContextDefaults(Context context) {
     if(context.getType() == Type.INLINE_PUSH){
-      context.addContext(getNewlinePop());
+      //context.addContext(getNewlinePop());
+      List<Style> inherStyles = Lists.newArrayList();
+      if(context.getParent() != null){
+        inherStyles.addAll(context.getParent().getStyles().stream().map(m -> {
+          if(m != null){
+            return m.clone();
+          }
+          return null;
+        }).collect(Collectors.toList()));
+        if(inherStyles.size() != 0){
+          context.setInheritedStyles(inherStyles);
+        }
+        else{
+          context.setInheritedStyles(context.getStyles());
+        }
+
+      }
+
     }
 
     if(context.getType() == Type.INLINE_PUSH || context.getType() == Type.MULTILINE_PUSH){

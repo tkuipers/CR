@@ -34,18 +34,13 @@ public class FileParser implements IFileParser {
     List<StyledString> strings = Lists.newArrayList();
     var lastMatchEndMarker = 0;
     while(m.find()) {
-      System.out.println("LOOPING");
-      System.out.println("\tcurrentString: " + currentString);
-      System.out.println("\tstart: " + m.start());
-      System.out.println("\tend:   " + m.end());
-      System.out.println("\tstack: " + stack);
       addGapStringToList(currentString, stack, m, strings, lastMatchEndMarker);
       var stringToApplyTo = currentString.substring(m.start(), m.end());
       IContextContainer context = getContextForSubString(stringToApplyTo, stack);
 
       if(context != null) {
         currentString = currentString.substring(m.end());
-        strings.add(applyStylesToString(stringToApplyTo, context));
+        strings.add(applyStylesToString(stringToApplyTo, context, true));
         performStackOperations(stack, context);
 
         m = buildNewMatcher(currentString, stack);
@@ -53,11 +48,6 @@ public class FileParser implements IFileParser {
         break;
       }
     }
-    System.out.println("ENDING");
-    System.out.println("\tcurrentString: " + currentString);
-    //System.out.println("\tstart: " + m.start());
-    //System.out.println("\tend:   " + m.end());
-    System.out.println("\tstack: " + stack);
     addRemainingString(currentString, stack, strings);
     return strings;
   }
@@ -80,7 +70,7 @@ public class FileParser implements IFileParser {
 
   private void addGapStringToList(String currentString, ArrayDeque<IContextContainer> stack, Matcher m, List<StyledString> strings, int lastMatchEndMarker) {
     if (lastMatchEndMarker != m.start()) {
-      StyledString gapString = applyStylesToString(currentString.substring(lastMatchEndMarker, m.start()), stack.peek());
+      StyledString gapString = applyStylesToString(currentString.substring(lastMatchEndMarker, m.start()), stack.peek(), false);
       strings.add(gapString);
     }
   }
@@ -89,8 +79,8 @@ public class FileParser implements IFileParser {
     return determineRegexMatch(subString, stack.peek());
   }
 
-  private StyledString applyStylesToString(String stringToApplyTo, IContextContainer context) {
-    return buildStyledString(stringToApplyTo, context);
+  private StyledString applyStylesToString(String stringToApplyTo, IContextContainer context, boolean isActualMatch) {
+    return buildStyledString(stringToApplyTo, context, isActualMatch);
   }
 
   private void performStackOperations(ArrayDeque<IContextContainer> stack, IContextContainer context) {
@@ -116,14 +106,19 @@ public class FileParser implements IFileParser {
 
   private void addRemainingString(String currentString, ArrayDeque<IContextContainer> stack, List<StyledString> strings) {
     if(currentString.length() != 0){
-      strings.add(applyStylesToString(currentString, stack.peek()));
+      strings.add(applyStylesToString(currentString, stack.peek(), false));
     }
   }
 
-  private StyledString buildStyledString(String s, IContextContainer currentContext) {
+  private StyledString buildStyledString(String s, IContextContainer currentContext, boolean isActualMatch) {
     var gapString = new StyledString();
     gapString.setStringValue(s);
-    gapString.setStyles(currentContext.getStyles());
+    if(currentContext.getType() != Type.INLINE_PUSH || isActualMatch || currentContext.getInheritedStyles().size() == 0) {
+      gapString.setStyles(currentContext.getStyles());
+    }
+    else{
+      gapString.setStyles(currentContext.getInheritedStyles());
+    }
     return gapString;
   }
 

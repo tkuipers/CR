@@ -180,7 +180,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\nab");
 
-    assertEquals(4, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -191,19 +191,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
-
-    var styleLine4 = styledLines.get(3);
-    assertEquals(1, styleLine4.getStyles().size());
-    var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("mainStyle", styleLine4Style.getName());
-    assertEquals("ab", styleLine4.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\nab", styleLine2.getStringValue());
 
   }
 
@@ -220,7 +208,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\n");
 
-    assertEquals(3, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -231,13 +219,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\n", styleLine2.getStringValue());
 
   }
 
@@ -254,7 +236,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\nababcss\n");
 
-    assertEquals(7, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -265,37 +247,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
-
-    var styleLine4 = styledLines.get(3);
-    assertEquals(1, styleLine4.getStyles().size());
-    var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("mainStyle", styleLine4Style.getName());
-    assertEquals("ab", styleLine4.getStringValue());
-
-    var styleLine5 = styledLines.get(4);
-    assertEquals(1, styleLine5.getStyles().size());
-    var styleLine5Style = styleLine5.getStyles().get(0);
-    assertEquals("otherStyle", styleLine5Style.getName());
-    assertEquals("abc", styleLine5.getStringValue());
-
-    var styleLine6 = styledLines.get(5);
-    assertEquals(1, styleLine6.getStyles().size());
-    var styleLine6Style = styleLine6.getStyles().get(0);
-    assertEquals("otherStyle", styleLine6Style.getName());
-    assertEquals("ss", styleLine6.getStringValue());
-
-    var styleLine7 = styledLines.get(6);
-    assertEquals(1, styleLine7.getStyles().size());
-    var styleLine7Style = styleLine7.getStyles().get(0);
-    assertEquals("otherStyle", styleLine7Style.getName());
-    assertEquals("\n", styleLine7.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\nababcss\n", styleLine2.getStringValue());
   }
 
   @Test
@@ -323,7 +275,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefxyzgh\nijklmnopqrstuvwxz\nab");
 
-    assertEquals(8, styledLines.size());
+    assertEquals(4, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -345,32 +297,8 @@ public class IndividualLineParserTests {
     var styleLine4 = styledLines.get(3);
     assertEquals(1, styleLine4.getStyles().size());
     var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("thirdStyle", styleLine4Style.getName());
-    assertEquals("gh", styleLine4.getStringValue());
-
-    var styleLine5 = styledLines.get(4);
-    assertEquals(1, styleLine5.getStyles().size());
-    var styleLine5Style = styleLine5.getStyles().get(0);
-    assertEquals("thirdStyle", styleLine5Style.getName());
-    assertEquals("\n", styleLine5.getStringValue());
-
-    var styleLine6 = styledLines.get(5);
-    assertEquals(1, styleLine6.getStyles().size());
-    var styleLine6Style = styleLine6.getStyles().get(0);
-    assertEquals("otherStyle", styleLine6Style.getName());
-    assertEquals("ijklmnopqrstuvwxz", styleLine6.getStringValue());
-
-    var styleLine7 = styledLines.get(6);
-    assertEquals(1, styleLine7.getStyles().size());
-    var styleLine7Style = styleLine7.getStyles().get(0);
-    assertEquals("otherStyle", styleLine7Style.getName());
-    assertEquals("\n", styleLine7.getStringValue());
-
-    var styleLine8 = styledLines.get(7);
-    assertEquals(1, styleLine8.getStyles().size());
-    var styleLine8Style = styleLine8.getStyles().get(0);
-    assertEquals("mainStyle", styleLine8Style.getName());
-    assertEquals("ab", styleLine8.getStringValue());
+    assertEquals("otherStyle", styleLine4Style.getName());
+    assertEquals("gh\nijklmnopqrstuvwxz\nab", styleLine4.getStringValue());
   }
 
   @Test

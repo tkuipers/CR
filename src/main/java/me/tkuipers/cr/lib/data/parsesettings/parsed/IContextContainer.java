@@ -6,5 +6,6 @@ public interface IContextContainer {
   List<Context> getContexts();
   String getContextsCombinedRegex();
   List<Style> getStyles();
+  List<Style> getInheritedStyles();
   Type getType();
 }

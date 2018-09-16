@@ -100,27 +100,6 @@ public class SyntaxFileParserTests {
   }
 
   @Test
-  public void testInlinePushHasNewlinePop() throws IOException {
-    ClassLoader cl = this.getClass().getClassLoader();
-    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/InlinePushExample.yml"));
-    parser.build();
-    var settings = parser.getSettings();
-
-    assertEquals(1, settings.getStyles().size());
-    var style = settings.getStyles().get(0);
-    assertEquals("mainStyle", style.getName());
-    assertEquals("#000000", style.getColor());
-    assertEquals("#000001", style.getBackgrounColor());
-    var context = settings.getContexts().stream().filter(m -> m.getName().equals("main")).findFirst().orElseThrow();
-    assertEquals(1, context.getContexts().size());
-    var innerContext = context.getContexts().get(0);
-    assertEquals("New line pop", innerContext.getName());
-    assertEquals(Type.POP, innerContext.getType());
-    assertEquals("(\\r\\n|\\r|\\n)", innerContext.getRegex());
-
-  }
-
-  @Test
   public void testComplexExample() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/ComplexExample.yml"));
@@ -145,7 +124,7 @@ public class SyntaxFileParserTests {
     assertEquals("\\}", childContext.getRegex());
     assertEquals(1, childContext.getStyles().size());
 
-    assertEquals(2, childContext.getContexts().size());
+    assertEquals(1, childContext.getContexts().size());
     var grandChildContext = childContext.getContexts().get(0);
     assertEquals("grandChildContext", grandChildContext.getName());
     assertEquals(Type.PATTERN, grandChildContext.getType());

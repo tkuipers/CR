@@ -6,6 +6,15 @@ public class Style {
   private String backgrounColor;
   private boolean hasSpecialCapability;
 
+  public Style(){}
+
+  public Style(Style other){
+    this.name = other.name;
+    this.color = other.color;
+    this.backgrounColor = other.backgrounColor;
+    this.hasSpecialCapability = other.hasSpecialCapability;
+  }
+
   public String getName() {
     return name;
   }
@@ -36,6 +45,11 @@ public class Style {
 
   public void setHasSpecialCapability(boolean hasSpecialCapability) {
     this.hasSpecialCapability = hasSpecialCapability;
+  }
+
+  public Style clone(){
+    return new Style(this);
+
   }
 
   @Override

@@ -1,5 +1,6 @@
 package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
 import me.tkuipers.cr.lib.file.parser.file.regexHandler.RegularExpressionCombiner;
@@ -14,11 +15,14 @@ public class Context implements IContextContainer {
   private Type type;
   private String regex;
   private List<Style> styles;
+  private List<Style> inheritedStyles;
   private Map<String, Context> contexts;
   private String combinedRegex;
   private Context parent;
+
   public Context(){
     contexts = Maps.newHashMap();
+    inheritedStyles = Lists.newArrayList();
   }
 
   public Type getType() {
@@ -56,9 +60,6 @@ public class Context implements IContextContainer {
 
   public void setContexts(List<Context> contexts) {
     this.contexts = mapRegexList(contexts);
-    System.out.println("\tRenewing regex");
-    System.out.println("\tOld regex: " + combinedRegex);
-    System.out.println("\tNew regex: " + RegularExpressionCombiner.combineContexts(contexts));
     combinedRegex = RegularExpressionCombiner.combineContexts(contexts);
   }
 
@@ -69,7 +70,6 @@ public class Context implements IContextContainer {
   }
 
   private Map<String, Context> mapRegexList(Collection<Context> contexts) {
-    System.out.println("IN THIS METHOD");
     Map<String, Context> map = Maps.newHashMap();
     for (var context:contexts) {
       map.put(context.getRegex(), context);
@@ -93,12 +93,24 @@ public class Context implements IContextContainer {
     this.parent = parent;
   }
 
+  public List<Style> getInheritedStyles() {
+    return inheritedStyles;
+  }
+
+  public void setInheritedStyles(List<Style> inheritedStyles) {
+    this.inheritedStyles = inheritedStyles;
+  }
+
   @Override
   public String toString() {
     return "Context{" +
           "name='" + name + '\'' +
           ", type=" + type +
+          ", regex='" + regex + '\'' +
+          ", styles=" + styles +
+          ", inheritedStyles=" + inheritedStyles +
           ", combinedRegex='" + combinedRegex + '\'' +
+          ", parent=" + parent +
           '}';
   }
 }
