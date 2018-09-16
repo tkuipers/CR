@@ -9,15 +9,15 @@ contexts:
   styles:
   - "mainStyle"
   include: []
-  contexts: []
-- name: "childContext2"
-  type: "PATTERN"
-  regex: "\\\\}"
-  styles:
-  - "mainStyle"
-  include:
-  - "main"
-  contexts: []
+  contexts:
+  - name: "childContext2"
+    type: "PATTERN"
+    regex: "\\\\}"
+    styles:
+    - "mainStyle"
+    include:
+    - "main"
+    contexts: []
 styles:
 - name: "mainStyle"
   color: "#000000"

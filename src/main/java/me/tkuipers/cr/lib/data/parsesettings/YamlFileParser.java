@@ -81,16 +81,45 @@ public class YamlFileParser {
   }
 
   private void handleRecursions() {
+    System.out.println("RecursionList: " + recursionList);
     for(var pair : recursionList){
-      var parent = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getKey())).findFirst();
+      var parent = findContext(pair.getKey(), settings.getContexts());
       var child = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getValue())).findFirst();
-      if(parent.isPresent()){
+      System.out.println("checking the thing");
+      System.out.println("parent is present: " + (parent != null));
+      System.out.println("child is present: " + child.isPresent());
+      if(parent != null){
         if(child.isPresent()){
-          parent.get().addContext(child.get());
+          for(var grandChildContext : child.get().getContexts()){
+            parent.addContext(grandChildContext);
+          }
+
         }
       }
     }
 
+  }
+
+  private Context findContext(String contextName, List<Context> contexts){
+    Context out = null;
+    for(var context :contexts){
+      System.out.println("Comparing: " + contextName + " to " + context.getName());
+      if(context.getName().equals(contextName)){
+        out =  context;
+        break;
+      }
+
+      List<Context> children = Lists.newArrayList();
+      for(var childCon : context.getContexts()){
+        children.add(childCon);
+      }
+
+      out = findContext(contextName, children);
+      if(out != null){
+        break;
+      }
+    }
+    return out;
   }
 
 
@@ -204,10 +233,11 @@ public class YamlFileParser {
       if(contextMap.containsKey(include)){
         CRContext context = contextMap.get(include);
         if(!recursionInContext(context, parentContext)) {
-          list.add(buildContext(context, parentContext));
+          var newContext = buildContext(context, parentContext);
+          list.addAll(newContext.getContexts());
         }
         else{
-          recursionList.add(new Pair<>(context.getName(), include));
+          recursionList.add(new Pair<>(con.getName(), include));
         }
       }
       else{

@@ -61,7 +61,7 @@ public class SyntaxFileParserTests {
     parser.build();
     var settings = parser.getSettings();
 
-    var context = settings.getContexts().stream().filter(m -> m.getName().equals("childContext2")).findFirst().orElseThrow();
+    var context = settings.getContexts().get(0).getContexts().stream().filter(m -> m.getName().equals("childContext2")).findFirst().orElseThrow();
     assertEquals("childContext2", context.getName());
     assertEquals(Type.PATTERN, context.getType());
     assertEquals("\\\\}", context.getRegex());
@@ -72,12 +72,12 @@ public class SyntaxFileParserTests {
     assertEquals("#000001", style.getBackgrounColor());
     assertEquals(1, context.getContexts().size());
     var innerContext = context.getContexts().get(0);
-    assertEquals("main", innerContext.getName());
+    assertEquals("childContext2", innerContext.getName());
     assertEquals(Type.PATTERN, innerContext.getType());
-    assertEquals("\\{", innerContext.getRegex());
+    assertEquals("\\\\}", innerContext.getRegex());
     assertEquals(1, innerContext.getStyles().size());
     assertEquals("mainStyle", innerContext.getStyles().get(0).getName());
-    assertEquals(0, innerContext.getContexts().size());
+    assertEquals(1, innerContext.getContexts().size());
   }
 
   @Test

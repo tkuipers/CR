@@ -20,7 +20,7 @@ styles:
   color: "black"
 contexts:
 - name: "main"
-  regex: "(group)"
+  regex: "(^)"
   styles:
   - "base"
   type: "MAIN"

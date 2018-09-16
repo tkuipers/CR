@@ -17,6 +17,9 @@ public class Context implements IContextContainer {
   private Map<String, Context> contexts;
   private String combinedRegex;
   private Context parent;
+  public Context(){
+    contexts = Maps.newHashMap();
+  }
 
   public Type getType() {
     return type;

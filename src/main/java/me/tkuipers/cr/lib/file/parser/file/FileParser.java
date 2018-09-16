@@ -34,7 +34,11 @@ public class FileParser implements IFileParser {
     List<StyledString> strings = Lists.newArrayList();
     var lastMatchEndMarker = 0;
     while(m.find()) {
-      System.out.println("Stack at: " + currentString + ": " + stack);
+      System.out.println("LOOPING");
+      System.out.println("\tcurrentString: " + currentString);
+      System.out.println("\tstart: " + m.start());
+      System.out.println("\tend:   " + m.end());
+      System.out.println("\tstack: " + stack);
       addGapStringToList(currentString, stack, m, strings, lastMatchEndMarker);
       var stringToApplyTo = currentString.substring(m.start(), m.end());
       IContextContainer context = getContextForSubString(stringToApplyTo, stack);
@@ -49,6 +53,11 @@ public class FileParser implements IFileParser {
         break;
       }
     }
+    System.out.println("ENDING");
+    System.out.println("\tcurrentString: " + currentString);
+    //System.out.println("\tstart: " + m.start());
+    //System.out.println("\tend:   " + m.end());
+    System.out.println("\tstack: " + stack);
     addRemainingString(currentString, stack, strings);
     return strings;
   }

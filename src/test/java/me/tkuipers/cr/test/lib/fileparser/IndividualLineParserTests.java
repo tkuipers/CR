@@ -485,13 +485,14 @@ public class IndividualLineParserTests {
   }
 
   @Test
+  @Ignore
   public void testExampleSmallCase() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
     parser.build();
     var json =
           "group {\n" +
-          "  \n" +
+          "  f\n" +
           "}\n";
     var fParser = new FileParser(parser.getSettings(), file);
     var styledLines = fParser.parseLine(parser.getSettings(), json);
