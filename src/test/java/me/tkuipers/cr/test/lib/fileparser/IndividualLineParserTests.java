@@ -1,5 +1,7 @@
 package me.tkuipers.cr.test.lib.fileparser;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
@@ -385,6 +387,9 @@ public class IndividualLineParserTests {
   public void testExampleJSONFile() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
     var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
+    var mapper = new ObjectMapper(new YAMLFactory());
+    var crSettings = mapper.readValue(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"), CRSettings.class);
+    System.out.println(crSettings.getContexts());
     parser.build();
     var json = "execute \"song\";\n" +
           "\n" +
@@ -404,7 +409,7 @@ public class IndividualLineParserTests {
           "   group {\n" +
           "   \n" +
           "   }\n" +
-          "}";
+          "}}";
     var fParser = new FileParser(parser.getSettings(), file);
     var styledLines = fParser.parseLine(parser.getSettings(), json);
     System.out.println(styledLines);

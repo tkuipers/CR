@@ -26,10 +26,15 @@ contexts:
   type: "MAIN"
   contexts:
   - name: "keyword"
-    regex: "(\b[a-z][a-z0-9]*)"
+    regex: "(\\b[a-z][a-z0-9]*)"
     styles:
     - "keyword"
     type: "PATTERN"
+  - name: "numeric"
+    type: "PATTERN"
+    regex: "(\\b\\d+)"
+    styles:
+    - "numeric"
   - name: "openBrace"
     regex: "(\\{)"
     styles:
@@ -46,27 +51,27 @@ contexts:
     type: "PATTERN"
     styles:
     - "punctuation"
-  - name: "punc3"
+  - name: "openString"
     regex: "(\\\")"
     styles:
     - "text"
-    type: "INLINE_PUSH"
+    type: "MULTILINE_PUSH"
     contexts:
-    - name: "punc3Pop"
+    - name: "closeString"
       regex: "(\\\")"
       type: "POP"
     include:
     - "numeric"
-  - name: "punc4"
+  - name: "openBracket"
     regex: "(\\()"
     styles:
     - "text"
     type: "INLINE_PUSH"
     contexts:
-    - name: "punc4Pop"
+    - name: "closeBracket"
       type: "POP"
       regex: "\\)"
-    - name: "commaInPunc4"
+    - name: "commaInBracket"
       type: "PATTERN"
       regex: "(,)"
       styles:
@@ -74,20 +79,10 @@ contexts:
     include:
     - "numeric"
   - name: "comment"
-    regex: "(//.*)"
+    regex: "//.*"
     styles:
     - "comment"
     type: "PATTERN"
-  ##- name: "illegal"
-  #  regex: "([^\\s])"
-  #  styles:
-  #  - "illegal"
-  #  type: "PATTERN"
-  - name: "numeric"
-    type: "PATTERN"
-    regex: "(\\b\\d+)"
-    styles:
-    - "numeric"
   - name: "multilineComment"
     type: "MULTILINE_PUSH"
     regex: "(/\\*)"
@@ -99,3 +94,9 @@ contexts:
       styles:
       - "comment"
       regex: "(\\*/)"
+
+  #- name: "illegal"
+  #  regex: "([^\\s])"
+  #  styles:
+  #  - "illegal"
+  #  type: "PATTERN"

@@ -1,6 +1,7 @@
 package me.tkuipers.cr.lib.file.parser.file;
 
 import com.google.common.collect.Lists;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.IContextContainer;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.StyledString;
@@ -8,6 +9,7 @@ import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,15 +126,23 @@ public class FileParser implements IFileParser {
 
 
   private IContextContainer determineRegexMatch(String subString, IContextContainer parserContext) {
-    for(var context : parserContext.getContexts()){
+    IContextContainer outContext = null;
+    var contexts = parserContext.getContexts();
+    contexts.sort(Comparator.comparingInt(Context::getPriority));
+    for(var context : contexts){
       var regex = context.getRegex();
       var pattern = Pattern.compile(regex);
+
       var m = pattern.matcher(subString);
-      if(m.matches()){
-        return context;
+      if(outContext == null){
+        if(m.matches()){
+          outContext = context;
+          break;
+        }
       }
+
     }
-    return null;
+    return outContext;
   }
 
   @Override

@@ -18,9 +18,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -72,12 +70,18 @@ public class YamlFileParser {
     settings.setStyles(newArrayList(buildStyle(styleMap.get(mainCRContext.getStyles().get(0)))));
 
     settings.setStyles(newArrayList(mainCRContext.getStyles().stream().map(m -> buildStyle(styleMap.get(m))).collect(Collectors.toList())));
+
     //var mainContext = settings.getContexts().stream().filter(m -> m.getType() == Type.MAIN).findFirst();
     this.settings = settings;
 
     //detect the loop
     //add it to post procesing using impl and ID
     handleRecursions();
+    setOrderOfContexts(settings.getContexts());
+  }
+
+  private void setOrderOfContexts(List<Context> contexts) {
+    Collections.sort(contexts, Comparator.comparingInt(Context::getPriority));
   }
 
   private void handleRecursions() {
@@ -151,11 +155,16 @@ public class YamlFileParser {
   }
 
   private List<Context> buildContexts(List<CRContext> conList, Context parentContext) {
-    return conList.stream().map(con -> buildContext(con, parentContext)).collect(Collectors.toList());
+    List<Context>newList = Lists.newArrayList();
+    for(int i = 0; i < conList.size(); i++){
+      newList.add(buildContext(conList.get(i), parentContext, i));
+    }
+    return newList;
   }
 
-  private Context buildContext(CRContext con, Context parentContext) {
+  private Context buildContext(CRContext con, Context parentContext, int priority) {
     var context = new Context();
+    context.setPriority(priority);
     context.setName(con.getName());
     context.setRegex(con.getRegex());
     context.setType(con.getType());
@@ -171,7 +180,6 @@ public class YamlFileParser {
 
   private void addContextDefaults(Context context) {
     if(context.getType() == Type.INLINE_PUSH){
-      //context.addContext(getNewlinePop());
       List<Style> inherStyles = Lists.newArrayList();
       if(context.getParent() != null){
         inherStyles.addAll(context.getParent().getStyles().stream().map(m -> {
@@ -239,14 +247,15 @@ public class YamlFileParser {
 
   private List<Context> buildContexts(CRContext con, Context parentContext) {
     List<Context> list = newArrayList();
-    for(var crContext : con.getContexts()){
-      list.add(buildContext(crContext, parentContext));
+    for(int i = 0; i < con.getContexts().size(); i++){
+      list.add(buildContext(con.getContexts().get(i), parentContext, i));
     }
-    for(var include : con.getInclude()){
+    for(int i = 0; i < con.getInclude().size(); i++ ){
+      var include = con.getInclude().get(i);
       if(contextMap.containsKey(include)){
         CRContext context = contextMap.get(include);
         if(!recursionInContext(context, parentContext)) {
-          var newContext = buildContext(context, parentContext);
+          var newContext = buildContext(context, parentContext, con.getContexts().size()+i);
           list.addAll(newContext.getContexts());
         }
         else{

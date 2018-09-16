@@ -8,4 +8,5 @@ public interface IContextContainer {
   List<Style> getStyles();
   List<Style> getInheritedStyles();
   Type getType();
+  int getPriority();
 }

@@ -19,6 +19,7 @@ public class Context implements IContextContainer {
   private Map<String, Context> contexts;
   private String combinedRegex;
   private Context parent;
+  private int priority;
 
   public Context(){
     contexts = Maps.newHashMap();
@@ -99,6 +100,14 @@ public class Context implements IContextContainer {
 
   public void setInheritedStyles(List<Style> inheritedStyles) {
     this.inheritedStyles = inheritedStyles;
+  }
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
   }
 
   @Override
