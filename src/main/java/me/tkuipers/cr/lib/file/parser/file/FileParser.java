@@ -134,11 +134,9 @@ public class FileParser implements IFileParser {
       var pattern = Pattern.compile(regex);
 
       var m = pattern.matcher(subString);
-      if(outContext == null){
-        if(m.matches()){
-          outContext = context;
-          break;
-        }
+      if(m.matches()){
+        outContext = context;
+        break;
       }
 
     }

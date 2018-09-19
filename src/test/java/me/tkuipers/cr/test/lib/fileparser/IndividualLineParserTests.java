@@ -16,7 +16,6 @@ import me.tkuipers.cr.test.utils.TokenizerTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.yaml.snakeyaml.tokens.Token;
 
 import java.io.File;
 import java.io.IOException;
@@ -383,12 +382,12 @@ public class IndividualLineParserTests {
   }
 
   @Test
-  @Ignore
+  //@Ignore
   public void testExampleJSONFile() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
-    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"));
     var mapper = new ObjectMapper(new YAMLFactory());
-    var crSettings = mapper.readValue(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"), CRSettings.class);
+    var crSettings = mapper.readValue(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"), CRSettings.class);
     System.out.println(crSettings.getContexts());
     parser.build();
     var json = "execute \"song\";\n" +
@@ -421,7 +420,7 @@ public class IndividualLineParserTests {
   @Ignore
   public void testExampleSmallCase() throws IOException {
     ClassLoader cl = this.getClass().getClassLoader();
-    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/JSONSyntaxFile.yml"));
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"));
     parser.build();
     var json =
           "group {\n" +

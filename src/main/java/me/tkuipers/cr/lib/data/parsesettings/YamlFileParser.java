@@ -87,38 +87,28 @@ public class YamlFileParser {
   private void handleRecursions() {
     for(var pair : recursionList){
       var parent = findContext(pair.getKey(), settings.getContexts());
-      var child = settings.getContexts().stream().filter(m -> m.getName().equals(pair.getValue())).findFirst();
-      if(parent != null){
-        if(child.isPresent()){
-          for(var grandChildContext : child.get().getContexts()){
-            parent.addContext(grandChildContext);
-          }
+      var child = findContext(pair.getValue(), settings.getContexts());
+      addChild(parent, child);
+    }
+  }
 
+  private void addChild(Context parent, Context child) {
+    if(parent != null){
+      if(child != null) {
+        for(var grandChildContext : child.getContexts()){
+          parent.addContext(grandChildContext);
         }
       }
     }
-
   }
 
   private Context findContext(String contextName, List<Context> contexts){
-    Context out = null;
-    for(var context :contexts){
+    for(var context : contexts){
       if(context.getName().equals(contextName)){
-        out =  context;
-        break;
-      }
-
-      List<Context> children = Lists.newArrayList();
-      for(var childCon : context.getContexts()){
-        children.add(childCon);
-      }
-
-      out = findContext(contextName, children);
-      if(out != null){
-        break;
+        return context;
       }
     }
-    return out;
+    return findContext(contextName, contexts.stream().flatMap(m -> m.getContexts().stream()).collect(Collectors.toList()));
   }
 
 
@@ -156,9 +146,7 @@ public class YamlFileParser {
 
   private List<Context> buildContexts(List<CRContext> conList, Context parentContext) {
     List<Context>newList = Lists.newArrayList();
-    for(int i = 0; i < conList.size(); i++){
-      newList.add(buildContext(conList.get(i), parentContext, i));
-    }
+    addNestedContexts(parentContext, newList, conList);
     return newList;
   }
 
@@ -247,26 +235,38 @@ public class YamlFileParser {
 
   private List<Context> buildContexts(CRContext con, Context parentContext) {
     List<Context> list = newArrayList();
-    for(int i = 0; i < con.getContexts().size(); i++){
-      list.add(buildContext(con.getContexts().get(i), parentContext, i));
-    }
+    addNestedContexts(parentContext, list, con.getContexts());
     for(int i = 0; i < con.getInclude().size(); i++ ){
-      var include = con.getInclude().get(i);
-      if(contextMap.containsKey(include)){
-        CRContext context = contextMap.get(include);
-        if(!recursionInContext(context, parentContext)) {
-          var newContext = buildContext(context, parentContext, con.getContexts().size()+i);
-          list.addAll(newContext.getContexts());
-        }
-        else{
-          recursionList.add(new Pair<>(con.getName(), include));
-        }
-      }
-      else{
-        throw new SyntaxParseException("Found unexpected context type to include: " + include);
-      }
+      handleInclude(con, parentContext, list, i);
     }
     return list;
+  }
+
+  private void handleInclude(CRContext con, Context parentContext, List<Context> list, int i) {
+    var include = con.getInclude().get(i);
+    if(contextMap.containsKey(include)){
+      CRContext context = contextMap.get(include);
+      if(!recursionInContext(context, parentContext)) {
+        includeContextWithNoRecursion(con, parentContext, list, i, context);
+      }
+      else{
+        recursionList.add(new Pair<>(con.getName(), include));
+      }
+    }
+    else{
+      throw new SyntaxParseException("Found unexpected context type to include: " + include);
+    }
+  }
+
+  private void includeContextWithNoRecursion(CRContext con, Context parentContext, List<Context> list, int i, CRContext context) {
+    var newContext = buildContext(context, parentContext, con.getContexts().size()+i);
+    list.addAll(newContext.getContexts());
+  }
+
+  private void addNestedContexts(Context parentContext, List<Context> list, List<CRContext> contexts) {
+    for (int i = 0; i < contexts.size(); i++) {
+      list.add(buildContext(contexts.get(i), parentContext, i));
+    }
   }
 
   private boolean recursionInContext(CRContext context, Context parentContext) {
