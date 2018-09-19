@@ -73,16 +73,4 @@ public class CRContext {
 
   public CRContext clone(){ return new CRContext(this); }
 
-  @Override
-  public String toString() {
-    return "CRContext{" +
-          "name='" + name + '\'' +
-          ", type=" + type +
-          ", regex='" + regex + '\'' +
-          ", styles=" + styles +
-          ", include=" + include +
-          ", contexts=" + contexts +
-          '}';
-  }
-
 }

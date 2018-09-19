@@ -1,5 +1,7 @@
 package me.tkuipers.cr.test.lib.fileparser;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
 import me.tkuipers.cr.lib.data.parsesettings.YamlFileParser;
 import me.tkuipers.cr.lib.data.parsesettings.filebacked.CRContext;
@@ -9,11 +11,11 @@ import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 import me.tkuipers.cr.lib.file.parser.file.FileParser;
 import me.tkuipers.cr.lib.file.parser.file.IFileParser;
+import me.tkuipers.cr.lib.file.parser.tokentranslator.HTMLTokenTranslator;
 import me.tkuipers.cr.test.utils.TokenizerTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.yaml.snakeyaml.tokens.Token;
 
 import java.io.File;
 import java.io.IOException;
@@ -179,7 +181,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\nab");
 
-    assertEquals(4, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -190,19 +192,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
-
-    var styleLine4 = styledLines.get(3);
-    assertEquals(1, styleLine4.getStyles().size());
-    var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("mainStyle", styleLine4Style.getName());
-    assertEquals("ab", styleLine4.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\nab", styleLine2.getStringValue());
 
   }
 
@@ -219,7 +209,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\n");
 
-    assertEquals(3, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -230,13 +220,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\n", styleLine2.getStringValue());
 
   }
 
@@ -253,7 +237,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefghijklmnopqrstuvwxyz\nababcss\n");
 
-    assertEquals(7, styledLines.size());
+    assertEquals(2, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -264,37 +248,7 @@ public class IndividualLineParserTests {
     assertEquals(1, styleLine2.getStyles().size());
     var styleLine2Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine2Style.getName());
-    assertEquals("defghijklmnopqrstuvwxyz", styleLine2.getStringValue());
-
-    var styleLine3 = styledLines.get(2);
-    assertEquals(1, styleLine3.getStyles().size());
-    var styleLine3Style = styleLine3.getStyles().get(0);
-    assertEquals("otherStyle", styleLine3Style.getName());
-    assertEquals("\n", styleLine3.getStringValue());
-
-    var styleLine4 = styledLines.get(3);
-    assertEquals(1, styleLine4.getStyles().size());
-    var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("mainStyle", styleLine4Style.getName());
-    assertEquals("ab", styleLine4.getStringValue());
-
-    var styleLine5 = styledLines.get(4);
-    assertEquals(1, styleLine5.getStyles().size());
-    var styleLine5Style = styleLine5.getStyles().get(0);
-    assertEquals("otherStyle", styleLine5Style.getName());
-    assertEquals("abc", styleLine5.getStringValue());
-
-    var styleLine6 = styledLines.get(5);
-    assertEquals(1, styleLine6.getStyles().size());
-    var styleLine6Style = styleLine6.getStyles().get(0);
-    assertEquals("otherStyle", styleLine6Style.getName());
-    assertEquals("ss", styleLine6.getStringValue());
-
-    var styleLine7 = styledLines.get(6);
-    assertEquals(1, styleLine7.getStyles().size());
-    var styleLine7Style = styleLine7.getStyles().get(0);
-    assertEquals("otherStyle", styleLine7Style.getName());
-    assertEquals("\n", styleLine7.getStringValue());
+    assertEquals("defghijklmnopqrstuvwxyz\nababcss\n", styleLine2.getStringValue());
   }
 
   @Test
@@ -322,7 +276,7 @@ public class IndividualLineParserTests {
 
     var styledLines = parser.parseLine(settings, "abcdefxyzgh\nijklmnopqrstuvwxz\nab");
 
-    assertEquals(8, styledLines.size());
+    assertEquals(4, styledLines.size());
     var styleLine1 = styledLines.get(0);
     assertEquals(1, styleLine1.getStyles().size());
     var styleLine1Style = styleLine1.getStyles().get(0);
@@ -344,32 +298,8 @@ public class IndividualLineParserTests {
     var styleLine4 = styledLines.get(3);
     assertEquals(1, styleLine4.getStyles().size());
     var styleLine4Style = styleLine4.getStyles().get(0);
-    assertEquals("thirdStyle", styleLine4Style.getName());
-    assertEquals("gh", styleLine4.getStringValue());
-
-    var styleLine5 = styledLines.get(4);
-    assertEquals(1, styleLine5.getStyles().size());
-    var styleLine5Style = styleLine5.getStyles().get(0);
-    assertEquals("thirdStyle", styleLine5Style.getName());
-    assertEquals("\n", styleLine5.getStringValue());
-
-    var styleLine6 = styledLines.get(5);
-    assertEquals(1, styleLine6.getStyles().size());
-    var styleLine6Style = styleLine6.getStyles().get(0);
-    assertEquals("otherStyle", styleLine6Style.getName());
-    assertEquals("ijklmnopqrstuvwxz", styleLine6.getStringValue());
-
-    var styleLine7 = styledLines.get(6);
-    assertEquals(1, styleLine7.getStyles().size());
-    var styleLine7Style = styleLine7.getStyles().get(0);
-    assertEquals("otherStyle", styleLine7Style.getName());
-    assertEquals("\n", styleLine7.getStringValue());
-
-    var styleLine8 = styledLines.get(7);
-    assertEquals(1, styleLine8.getStyles().size());
-    var styleLine8Style = styleLine8.getStyles().get(0);
-    assertEquals("mainStyle", styleLine8Style.getName());
-    assertEquals("ab", styleLine8.getStringValue());
+    assertEquals("otherStyle", styleLine4Style.getName());
+    assertEquals("gh\nijklmnopqrstuvwxz\nab", styleLine4.getStringValue());
   }
 
   @Test
@@ -449,6 +379,58 @@ public class IndividualLineParserTests {
     var styleLine4Style = styleLine2.getStyles().get(0);
     assertEquals("otherStyle", styleLine4Style.getName());
     assertEquals("\nab", styleLine4.getStringValue());
+  }
+
+  @Test
+  //@Ignore
+  public void testExampleJSONFile() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"));
+    var mapper = new ObjectMapper(new YAMLFactory());
+    var crSettings = mapper.readValue(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"), CRSettings.class);
+    System.out.println(crSettings.getContexts());
+    parser.build();
+    var json = "execute \"song\";\n" +
+          "\n" +
+          "group {\n" +
+          "   execute 1;\n" +
+          "   execute 2;\n" +
+          "   // This is a comment\n" +
+          "   print \"hello\";\n" +
+          "   \n" +
+          "   /* This \n" +
+          "   is \n" +
+          "   a \n" +
+          "   multiline\n" +
+          "   comment */\n" +
+          "   a (1,2,3);\n" +
+          "   a;\n" +
+          "   group {\n" +
+          "   \n" +
+          "   }\n" +
+          "}}";
+    var fParser = new FileParser(parser.getSettings(), file);
+    var styledLines = fParser.parseLine(parser.getSettings(), json);
+    System.out.println(styledLines);
+
+    System.out.println(new HTMLTokenTranslator().getStringFromToken(styledLines));
+  }
+
+  @Test
+  @Ignore
+  public void testExampleSmallCase() throws IOException {
+    ClassLoader cl = this.getClass().getClassLoader();
+    var parser = new YamlFileParser(cl.getResource("ExampleYamlFiles/CustomLanguageSyntaxFile.yml"));
+    parser.build();
+    var json =
+          "group {\n" +
+          "  f\n" +
+          "}\n";
+    var fParser = new FileParser(parser.getSettings(), file);
+    var styledLines = fParser.parseLine(parser.getSettings(), json);
+    System.out.println(styledLines);
+
+    System.out.println(new HTMLTokenTranslator().getStringFromToken(styledLines));
   }
 
 }

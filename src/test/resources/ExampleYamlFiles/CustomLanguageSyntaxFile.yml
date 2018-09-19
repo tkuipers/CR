@@ -1,0 +1,102 @@
+---
+name: "jsonparser"
+fileExtensions:
+- ".json"
+styles:
+- name: "comment"
+  color: "LightGreen"
+- name: "keyword"
+  color: "cyan"
+- name: "numeric"
+  color: "gold"
+- name: "punctuation"
+  color: "red"
+- name: "text"
+  color: "brown"
+- name: "illegal"
+  color: "white"
+  backgrounColor: "red"
+- name: "base"
+  color: "black"
+contexts:
+- name: "main"
+  regex: "(^)"
+  styles:
+  - "base"
+  type: "MAIN"
+  contexts:
+  - name: "keyword"
+    regex: "(\\b[a-z][a-z0-9]*)"
+    styles:
+    - "keyword"
+    type: "PATTERN"
+  - name: "numeric"
+    type: "PATTERN"
+    regex: "(\\b\\d+)"
+    styles:
+    - "numeric"
+  - name: "openBrace"
+    regex: "(\\{)"
+    styles:
+    - "punctuation"
+    type: "INLINE_PUSH"
+    contexts:
+    - name: "closeBrace"
+      type: "POP"
+      regex: "(\\})"
+    include:
+      - "main"
+  - name: "punc2"
+    regex: "(;)"
+    type: "PATTERN"
+    styles:
+    - "punctuation"
+  - name: "openString"
+    regex: "(\\\")"
+    styles:
+    - "text"
+    type: "MULTILINE_PUSH"
+    contexts:
+    - name: "closeString"
+      regex: "(\\\")"
+      type: "POP"
+    include:
+    - "numeric"
+  - name: "openBracket"
+    regex: "(\\()"
+    styles:
+    - "text"
+    type: "INLINE_PUSH"
+    contexts:
+    - name: "closeBracket"
+      type: "POP"
+      regex: "\\)"
+    - name: "commaInBracket"
+      type: "PATTERN"
+      regex: "(,)"
+      styles:
+      - "punctuation"
+    include:
+    - "numeric"
+  - name: "comment"
+    regex: "//.*"
+    styles:
+    - "comment"
+    type: "PATTERN"
+  - name: "multilineComment"
+    type: "MULTILINE_PUSH"
+    regex: "(/\\*)"
+    styles:
+    - "comment"
+    contexts:
+    - name: "multilineCommentPOP"
+      type: "POP"
+      styles:
+      - "comment"
+      regex: "(\\*/)"
+
+  #- name: "illegal"
+  #  regex: "([^\\s])"
+  #  styles:
+  #  - "illegal"
+  #  type: "PATTERN"

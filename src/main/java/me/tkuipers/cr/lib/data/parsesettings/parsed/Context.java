@@ -1,5 +1,6 @@
 package me.tkuipers.cr.lib.data.parsesettings.parsed;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.tkuipers.cr.lib.data.parsesettings.exceptions.SyntaxParseException;
 import me.tkuipers.cr.lib.file.parser.file.regexHandler.RegularExpressionCombiner;
@@ -14,8 +15,16 @@ public class Context implements IContextContainer {
   private Type type;
   private String regex;
   private List<Style> styles;
+  private List<Style> inheritedStyles;
   private Map<String, Context> contexts;
   private String combinedRegex;
+  private Context parent;
+  private int priority;
+
+  public Context(){
+    contexts = Maps.newHashMap();
+    inheritedStyles = Lists.newArrayList();
+  }
 
   public Type getType() {
     return type;
@@ -65,7 +74,6 @@ public class Context implements IContextContainer {
     Map<String, Context> map = Maps.newHashMap();
     for (var context:contexts) {
       map.put(context.getRegex(), context);
-
     }
     return map;
   }
@@ -78,12 +86,40 @@ public class Context implements IContextContainer {
     this.name = name;
   }
 
+  public Context getParent() {
+    return parent;
+  }
+
+  public void setParent(Context parent) {
+    this.parent = parent;
+  }
+
+  public List<Style> getInheritedStyles() {
+    return inheritedStyles;
+  }
+
+  public void setInheritedStyles(List<Style> inheritedStyles) {
+    this.inheritedStyles = inheritedStyles;
+  }
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
   @Override
   public String toString() {
     return "Context{" +
           "name='" + name + '\'' +
           ", type=" + type +
+          ", regex='" + regex + '\'' +
+          ", styles=" + styles +
+          ", inheritedStyles=" + inheritedStyles +
           ", combinedRegex='" + combinedRegex + '\'' +
+          ", parent=" + parent +
           '}';
   }
 }

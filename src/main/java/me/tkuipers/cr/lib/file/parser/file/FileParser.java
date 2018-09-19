@@ -1,6 +1,7 @@
 package me.tkuipers.cr.lib.file.parser.file;
 
 import com.google.common.collect.Lists;
+import me.tkuipers.cr.lib.data.parsesettings.parsed.Context;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.IContextContainer;
 import me.tkuipers.cr.lib.data.parsesettings.parsed.Type;
 import me.tkuipers.cr.lib.file.parser.StyledString;
@@ -8,6 +9,7 @@ import me.tkuipers.cr.lib.file.parser.exceptions.FileParseException;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +42,7 @@ public class FileParser implements IFileParser {
 
       if(context != null) {
         currentString = currentString.substring(m.end());
-        strings.add(applyStylesToString(stringToApplyTo, context));
+        strings.add(applyStylesToString(stringToApplyTo, context, true));
         performStackOperations(stack, context);
 
         m = buildNewMatcher(currentString, stack);
@@ -70,7 +72,7 @@ public class FileParser implements IFileParser {
 
   private void addGapStringToList(String currentString, ArrayDeque<IContextContainer> stack, Matcher m, List<StyledString> strings, int lastMatchEndMarker) {
     if (lastMatchEndMarker != m.start()) {
-      StyledString gapString = applyStylesToString(currentString.substring(lastMatchEndMarker, m.start()), stack.peek());
+      StyledString gapString = applyStylesToString(currentString.substring(lastMatchEndMarker, m.start()), stack.peek(), false);
       strings.add(gapString);
     }
   }
@@ -79,8 +81,8 @@ public class FileParser implements IFileParser {
     return determineRegexMatch(subString, stack.peek());
   }
 
-  private StyledString applyStylesToString(String stringToApplyTo, IContextContainer context) {
-    return buildStyledString(stringToApplyTo, context);
+  private StyledString applyStylesToString(String stringToApplyTo, IContextContainer context, boolean isActualMatch) {
+    return buildStyledString(stringToApplyTo, context, isActualMatch);
   }
 
   private void performStackOperations(ArrayDeque<IContextContainer> stack, IContextContainer context) {
@@ -95,8 +97,10 @@ public class FileParser implements IFileParser {
         throw new FileParseException("Cannot POP off of main context");
       case MULTILINE_PUSH:
       case INLINE_PUSH:
+      case MAIN:
         stack.push(context);
         break;
+
       default:
         throw new FileParseException("An unexpected error occured");
     }
@@ -104,28 +108,39 @@ public class FileParser implements IFileParser {
 
   private void addRemainingString(String currentString, ArrayDeque<IContextContainer> stack, List<StyledString> strings) {
     if(currentString.length() != 0){
-      strings.add(applyStylesToString(currentString, stack.peek()));
+      strings.add(applyStylesToString(currentString, stack.peek(), false));
     }
   }
 
-  private StyledString buildStyledString(String s, IContextContainer currentContext) {
+  private StyledString buildStyledString(String s, IContextContainer currentContext, boolean isActualMatch) {
     var gapString = new StyledString();
     gapString.setStringValue(s);
-    gapString.setStyles(currentContext.getStyles());
+    if(currentContext.getType() != Type.INLINE_PUSH || isActualMatch || currentContext.getInheritedStyles().size() == 0) {
+      gapString.setStyles(currentContext.getStyles());
+    }
+    else{
+      gapString.setStyles(currentContext.getInheritedStyles());
+    }
     return gapString;
   }
 
 
   private IContextContainer determineRegexMatch(String subString, IContextContainer parserContext) {
-    for(var context : parserContext.getContexts()){
+    IContextContainer outContext = null;
+    var contexts = parserContext.getContexts();
+    contexts.sort(Comparator.comparingInt(Context::getPriority));
+    for(var context : contexts){
       var regex = context.getRegex();
       var pattern = Pattern.compile(regex);
+
       var m = pattern.matcher(subString);
       if(m.matches()){
-        return context;
+        outContext = context;
+        break;
       }
+
     }
-    return null;
+    return outContext;
   }
 
   @Override
