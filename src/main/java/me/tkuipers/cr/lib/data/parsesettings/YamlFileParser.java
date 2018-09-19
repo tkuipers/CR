@@ -168,30 +168,31 @@ public class YamlFileParser {
 
   private void addContextDefaults(Context context) {
     if(context.getType() == Type.INLINE_PUSH){
-      List<Style> inherStyles = Lists.newArrayList();
-      if(context.getParent() != null){
-        inherStyles.addAll(context.getParent().getStyles().stream().map(m -> {
-          if(m != null){
-            return m.clone();
-          }
-          return null;
-        }).collect(Collectors.toList()));
-        if(inherStyles.size() != 0){
-          context.setInheritedStyles(inherStyles);
-        }
-        else{
-          context.setInheritedStyles(context.getStyles());
-        }
-
-      }
-
+      setInheritedStyles(context);
     }
 
     if(context.getType() == Type.INLINE_PUSH || context.getType() == Type.MULTILINE_PUSH){
-      for(var indContext : context.getContexts()){
-        if(indContext.getType() == Type.POP){
-          indContext.setStyles(context.getStyles());
-        }
+      setPopStyle(context);
+    }
+  }
+
+  private void setInheritedStyles(Context context) {
+    List<Style> inherStyles = Lists.newArrayList();
+    if(context.getParent() != null){
+      inherStyles.addAll(context.getParent().getStyles().stream().map(m -> m.clone()).collect(Collectors.toList()));
+      if(inherStyles.size() != 0){
+        context.setInheritedStyles(inherStyles);
+      }
+      else{
+        context.setInheritedStyles(context.getStyles());
+      }
+    }
+  }
+
+  private void setPopStyle(Context context) {
+    for(var indContext : context.getContexts()){
+      if(indContext.getType() == Type.POP){
+        indContext.setStyles(context.getStyles());
       }
     }
   }
