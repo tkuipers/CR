@@ -9,4 +9,4 @@ Currently, this is a simple syntax highlighter.
 
 ## Building
 This tool is currently designed to be built using Gradle (>4.7).
-It is made using Java 10.
+It is made using Java 10. 
